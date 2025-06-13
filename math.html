@@ -529,9 +529,28 @@
         // --- API Keys & External Links Configuration ---
         // IMPORTANT: Replace 'YOUR_YOUTUBE_API_KEY_HERE' with your actual YouTube Data API Key.
         // Get one from Google Cloud Console (APIs & Services -> Credentials -> Create credentials -> API Key).
-        const YOUTUBE_API_KEY = 'AIzaSyBNGX-ctd1bHFfKR1chi_xx6it7gaTbZOM'; 
-        // GEMINI_API_KEY is automatically provided by the Canvas environment for gemini-2.0-flash.
-        const GEMINI_API_KEY = "AIzaSyBrLFORMIa1Q73eot8KveqhFgHqpglI6YA"; 
+        // Using an array of API keys for fallback in case one fails or hits quota limits.
+        const YOUTUBE_API_KEYS = [
+            'AIzaSyBNGX-ctd1bHFfKR1chi_xx6it7gaTbZOM',
+            'AIzaSyC93w_UsnvHB1cY-QJFOIpVUVef0Kr9thU',
+            'AIzaSyAx9tVUn94XOf_z0P8SgK4ONGvtYTnG5CQ',
+            'AIzaSyCOXQjAi6p4AxAsmwRfiuAGyksC-GW7h0Q',
+            'AIzaSyCBpRZt8Ixw-9lOCvpPHRNS0z2IY942sZQ'
+        ];
+        // Index to keep track of the currently active YouTube API key being used.
+        let currentYoutubeApiKeyIndex = 0; 
+        
+        // GEMINI_API_KEYS: An array of Gemini API keys for fallback.
+        const GEMINI_API_KEYS = [
+            'AIzaSyD3N22MpwPfObp7SmuCzdAsdXduij1CAbg',
+            'AIzaSyBrLFORMIa1Q73eot8KveqhFgHqpglI6YA',
+            'AIzaSyDSO9QllEwb6GFzxmqLSvMEsbemoCHmSkc',
+            'AIzaSyDSxBCZWuN4EkiKOAwHUNNHhsGc3U6s_hM',
+            'AIzaSyBikw4QJ_U2GGFeGHiC9kX3K_BR677z74s'
+        ];
+        // Index to keep track of the currently active Gemini API key being used.
+        let currentGeminiApiKeyIndex = 0;
+
         const GEMINI_MODEL = "gemini-2.0-flash"; // Specify the Gemini text model to use.
         const IMAGEN_API_MODEL = "imagen-3.0-generate-002"; // Specify the Imagen model for image generation.
 
@@ -540,7 +559,7 @@
         // If provided and valid, the app will attempt to load this video first.
         // If left empty or invalid, it will fall back to searching based on CHAPTER_NAME.
         // Example: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-        const USER_PROVIDED_VIDEO_LINK = ''; 
+        const USER_PROVIDED_VIDEO_LINK = 'https://www.youtube.com/watch?v=8cR_1Qi-tP4&ab_channel=PreschoolPrepCompany'; 
 
 
         // URL for the next chapter page. Update this as your learning path progresses.
@@ -554,7 +573,7 @@
 
         // Define the current chapter's name. This is crucial as a keyword for YouTube video searches.
         // It helps find relevant content even if video titles don't exactly match.
-        const CHAPTER_NAME = 'Counting Numbers for Beginners'; 
+        const CHAPTER_NAME = 'Counting and Numbers for Beginners'; 
 
         // --- DOM Element References ---
         // Caching DOM elements improves performance by reducing repeated lookups.
@@ -854,14 +873,19 @@
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
         }
 
+        // Promise to ensure YouTube Iframe API is ready before proceeding
+        let youtubeApiReadyPromiseResolve;
+        const youtubeApiReadyPromise = new Promise(resolve => {
+            youtubeApiReadyPromiseResolve = resolve;
+        });
+
         /**
          * Callback function automatically called by the YouTube Iframe API when it's fully loaded.
-         * The YouTube player instance is initialized within `searchYouTubeVideo` once a video ID is successfully found.
+         * This now resolves the promise, allowing the rest of the initialization to proceed.
          */
         window.onYouTubeIframeAPIReady = function() {
-            // This function exists to fulfill the YouTube API requirement.
-            // The actual player creation is handled by `createYoutubePlayer`
-            // which is called after a video ID is retrieved by `searchYouTubeVideo`.
+            console.log("YouTube Iframe API is ready!");
+            youtubeApiReadyPromiseResolve();
         };
 
         /**
@@ -1032,80 +1056,119 @@
 
         /**
          * Fetches YouTube video details (snippet, contentDetails) for a given video ID.
+         * It iterates through the available API keys until a successful response is received.
          * @param {string} videoId The YouTube video ID.
          * @returns {Promise<Object|null>} A promise resolving to a video details object or null if not found/error.
          */
         async function fetchVideoDetailsById(videoId) {
             if (!videoId) return null;
-            const videoDetailsUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${YOUTUBE_API_KEY}`;
-            try {
-                const response = await fetch(videoDetailsUrl);
-                const data = await response.json();
-                if (data.items && data.items.length > 0) {
-                    const videoDetails = data.items[0];
-                    const durationSeconds = parseYouTubeDuration(videoDetails.contentDetails.duration);
-                    return {
-                        id: videoId,
-                        snippet: videoDetails.snippet,
-                        durationSeconds: durationSeconds,
-                        relevanceScore: calculateRelevance(videoDetails.snippet.title, videoDetails.snippet.description, CHAPTER_NAME) // Calculate relevance even for direct link
-                    };
+            let attempts = 0;
+            while (attempts < YOUTUBE_API_KEYS.length) {
+                const apiKey = YOUTUBE_API_KEYS[currentYoutubeApiKeyIndex % YOUTUBE_API_KEYS.length]; // Cycle through keys
+                const videoDetailsUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${apiKey}`;
+                
+                try {
+                    console.log(`Attempting to fetch video details for ID: ${videoId} with YouTube key index: ${currentYoutubeApiKeyIndex % YOUTUBE_API_KEYS.length}`);
+                    const response = await fetch(videoDetailsUrl);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.items && data.items.length > 0) {
+                            const videoDetails = data.items[0];
+                            const durationSeconds = parseYouTubeDuration(videoDetails.contentDetails.duration);
+                            currentYoutubeApiKeyIndex = 0; // Reset index on success to prioritize this key next time
+                            return {
+                                id: videoId,
+                                snippet: videoDetails.snippet,
+                                durationSeconds: durationSeconds,
+                                relevanceScore: calculateRelevance(videoDetails.snippet.title, videoDetails.snippet.description, CHAPTER_NAME)
+                            };
+                        } else {
+                             // If response is OK but no items, it means video not found or unavailable
+                            console.warn(`Video ID ${videoId} not found or unavailable with YouTube key ${apiKey}.`);
+                        }
+                    } else if (response.status === 403 || response.status === 400) {
+                        // 403 Forbidden or 400 Bad Request often means API key issue (invalid, quota exceeded, etc.)
+                        console.warn(`YouTube API key "${apiKey}" failed with status ${response.status} for video details. Trying next key...`);
+                    } else {
+                        // Other HTTP errors (e.g., 500, 503)
+                        console.error(`Error fetching details for video ID ${videoId} with YouTube key ${apiKey}: Status ${response.status} - ${response.statusText}`);
+                    }
+                } catch (error) {
+                    // Network errors (e.g., no internet, DNS issues)
+                    console.error(`Network error fetching details for video ID ${videoId} with YouTube key ${apiKey}:`, error);
                 }
-            } catch (error) {
-                console.error(`Error fetching details for video ID ${videoId}:`, error);
+                
+                currentYoutubeApiKeyIndex++; // Move to the next key for the next attempt
+                attempts++;
             }
-            return null;
+            console.error("All YouTube API keys failed to fetch video details.");
+            return null; // All keys exhausted
         }
 
         /**
          * Fetches YouTube videos with details including duration and relevance score.
-         * Always fetches with `videoDuration: 'any'` to get the broadest possible set of videos initially.
+         * It iterates through the available API keys until a successful response is received.
          * @param {string} query The search query string for YouTube.
          * @param {number} maxResults The maximum number of search results to request from the API.
          * @returns {Promise<Array<Object>>} A promise resolving to an array of video objects,
          * each containing id, snippet, durationSeconds, and relevanceScore.
          */
         async function fetchVideosWithDetails(query, maxResults) {
-            // Constructs the YouTube Data API search URL.
-            // `videoDuration` is set to 'any' to ensure all relevant videos are fetched initially,
-            // regardless of their length, for later custom filtering.
-            const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&order=viewCount&maxResults=${maxResults}&key=${YOUTUBE_API_KEY}`;
-            
-            console.log(`Attempting to fetch videos with query: "${query}"`);
-            const response = await fetch(youtubeApiUrl); // Make the API call
-            const data = await response.json(); // Parse the JSON response
+            let videosWithCalculatedDetails = [];
+            let attempts = 0;
+            while (attempts < YOUTUBE_API_KEYS.length) {
+                const apiKey = YOUTUBE_API_KEYS[currentYoutubeApiKeyIndex % YOUTUBE_API_KEYS.length]; // Cycle through keys
+                const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&order=viewCount&maxResults=${maxResults}&key=${apiKey}`;
 
-            const videosWithCalculatedDetails = [];
-            // Process search results if items are found and are videos.
-            if (data.items && data.items.length > 0) {
-                for (const item of data.items.filter(i => i.id.kind === 'youtube#video')) {
-                    try {
-                        // Fetch detailed information for each video to get accurate duration.
-                        const videoDetailsUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${item.id.videoId}&key=${YOUTUBE_API_KEY}`;
-                        const detailsResponse = await fetch(videoDetailsUrl);
-                        const detailsData = await detailsResponse.json();
+                try {
+                    console.log(`Attempting to fetch videos for query: "${query}" with YouTube key index: ${currentYoutubeApiKeyIndex % YOUTUBE_API_KEYS.length}`);
+                    const response = await fetch(youtubeApiUrl);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.items && data.items.length > 0) {
+                            for (const item of data.items.filter(i => i.id.kind === 'youtube#video')) {
+                                // Use the *same* successful key for fetching individual video details
+                                const videoDetailsUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${item.id.videoId}&key=${apiKey}`; 
+                                const detailsResponse = await fetch(videoDetailsUrl);
+                                const detailsData = await detailsResponse.json();
 
-                        if (detailsData.items && detailsData.items.length > 0) {
-                            const videoDetails = detailsData.items[0];
-                            // Parse ISO 8601 duration to seconds.
-                            const durationSeconds = parseYouTubeDuration(videoDetails.contentDetails.duration);
-                            // Calculate relevance based on chapter name.
-                            const relevanceScore = calculateRelevance(videoDetails.snippet.title, videoDetails.snippet.description, CHAPTER_NAME);
-                            
-                            // Add processed video details to the array.
-                            videosWithCalculatedDetails.push({
-                                id: item.id.videoId,
-                                snippet: videoDetails.snippet,
-                                durationSeconds: durationSeconds,
-                                relevanceScore: relevanceScore
-                            });
+                                if (detailsData.items && detailsData.items.length > 0) {
+                                    const videoDetails = detailsData.items[0];
+                                    const durationSeconds = parseYouTubeDuration(videoDetails.contentDetails.duration);
+                                    const relevanceScore = calculateRelevance(videoDetails.snippet.title, videoDetails.snippet.description, CHAPTER_NAME);
+                                    videosWithCalculatedDetails.push({
+                                        id: item.id.videoId,
+                                        snippet: videoDetails.snippet,
+                                        durationSeconds: durationSeconds,
+                                        relevanceScore: relevanceScore
+                                    });
+                                }
+                            }
+                            currentYoutubeApiKeyIndex = 0; // Reset index on success
+                            return videosWithCalculatedDetails; // Return immediately on successful search and detail fetch
+                        } else {
+                            // If search response is OK but no items, it means no videos found for the query
+                            console.warn(`No videos found for query "${query}" with YouTube key ${apiKey}.`);
                         }
-                    } catch (detailError) {
-                        console.warn(`Could not fetch details for video ${item.id.videoId}:`, detailError);
+                    } else if (response.status === 403 || response.status === 400) {
+                        // 403 Forbidden or 400 Bad Request often means API key issue
+                        console.warn(`YouTube API key "${apiKey}" failed with status ${response.status} for search. Trying next key...`);
+                    } else {
+                        // Other HTTP errors
+                        console.error(`Error fetching search results with YouTube key ${apiKey}: Status ${response.status} - ${response.statusText}`);
                     }
+                } catch (error) {
+                    // Network errors
+                    console.error(`Network error fetching search results with YouTube key ${apiKey}:`, error);
                 }
+                
+                currentYoutubeApiKeyIndex++; // Move to the next key for the next attempt
+                attempts++;
             }
-            return videosWithCalculatedDetails; // Return the enriched list of videos
+            console.error("All YouTube API keys failed to fetch search results.");
+            return []; // Return empty array if all keys exhausted
         }
 
 
@@ -1241,6 +1304,7 @@
         /**
          * Uses the Gemini API to analyze the video's metadata (title, description, duration)
          * and generate a set of spaced checkpoints, each with multiple-choice questions.
+         * It iterates through the available API keys until a successful response is received.
          * @param {string} videoId The YouTube video ID.
          * @param {string} videoTitle The title of the video.
          * @param {string} videoDescription The description of the video.
@@ -1306,51 +1370,58 @@
                     }
                 }
             };
-            const apiKey = GEMINI_API_KEY;
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+            
+            let attempts = 0;
+            while (attempts < GEMINI_API_KEYS.length) {
+                const apiKey = GEMINI_API_KEYS[currentGeminiApiKeyIndex % GEMINI_API_KEYS.length]; // Cycle through keys
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                try {
+                    console.log(`Attempting to generate checkpoints with Gemini key index: ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}`);
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
 
-                // Check for HTTP errors in the response.
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Gemini API error: ${response.status} - ${errorData.error.message || response.statusText}`);
-                }
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Gemini API Raw Response for Checkpoints:', result);
 
-                const result = await response.json();
-                console.log('Gemini API Raw Response:', result);
+                        if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                            const jsonString = result.candidates[0].content.parts[0].text;
+                            const parsedCheckpoints = JSON.parse(jsonString);
 
-                // Safely access the generated content from the Gemini response.
-                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
-                    const jsonString = result.candidates[0].content.parts[0].text;
-                    const parsedCheckpoints = JSON.parse(jsonString); // Parse the JSON string into an object
+                            checkpoints = parsedCheckpoints.filter(cp => 
+                                cp.timestamp > 0 && cp.timestamp < currentVideoDuration * 0.95 
+                            ).sort((a, b) => a.timestamp - b.timestamp);
 
-                    // Filter checkpoints: ensure timestamps are valid (within video duration) and sort them.
-                    checkpoints = parsedCheckpoints.filter(cp => 
-                        cp.timestamp > 0 && cp.timestamp < currentVideoDuration * 0.95 // Ensure checkpoint is before video ends
-                    ).sort((a, b) => a.timestamp - b.timestamp); // Sort by timestamp
-
-                    if (checkpoints.length === 0) {
-                        showMessageBox('AI could not identify suitable checkpoints or generate valid questions. Please try a different chapter or video.');
+                            if (checkpoints.length === 0) {
+                                console.warn('AI could not identify suitable checkpoints or generate valid questions with this key.');
+                            } else {
+                                console.log('Generated and Filtered Checkpoints with Questions:', checkpoints);
+                                hideMessageBox();
+                                currentGeminiApiKeyIndex = 0; // Reset index on success
+                                return; // Exit function on success
+                            }
+                        } else {
+                            console.warn('Invalid response structure from Gemini API when generating questions with this key.');
+                        }
+                    } else if (response.status === 403 || response.status === 400) {
+                        console.warn(`Gemini API key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}) failed with status ${response.status} for checkpoint generation. Trying next key...`);
                     } else {
-                        console.log('Generated and Filtered Checkpoints with Questions:', checkpoints);
-                        hideMessageBox(); // Hide initial message
+                        console.error(`Error fetching checkpoints with Gemini key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}): Status ${response.status} - ${response.statusText}`);
                     }
-                } else {
-                    throw new Error('Invalid response structure from Gemini API when generating questions.');
+                } catch (error) {
+                    console.error(`Network error fetching checkpoints with Gemini key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}):`, error);
                 }
-            } catch (error) {
-                console.error('Error fetching questions from Gemini:', error);
-                showMessageBox(`Error generating questions. This might be due to video content or API issues: ${error.message}.`);
-                checkpoints = []; // Reset checkpoints on error
-            } finally {
-                loadingSpinner.style.display = 'none'; // Always hide spinner
+                currentGeminiApiKeyIndex++; // Move to the next key
+                attempts++;
             }
+            console.error("All Gemini API keys failed to generate checkpoints.");
+            showMessageBox(`Error generating questions after trying all API keys. Please check your network or API keys.`);
+            checkpoints = []; // Reset checkpoints on total failure
+            loadingSpinner.style.display = 'none'; // Always hide spinner
         }
 
         /**
@@ -1388,25 +1459,12 @@
                 hintButton.textContent = 'Get Hint ✨';
                 hintButton.dataset.questionIndex = qIndex; // Store question index for event delegation
 
-                // Add a "Generate Visual Aid" button for each question.
-                const visualAidButton = document.createElement('button');
-                visualAidButton.className = 'hint-button'; // Reusing hint-button styling for consistency
-                visualAidButton.textContent = 'Generate Visual Aid ✨';
-                visualAidButton.dataset.questionText = q.question_text; // Pass question text for prompt
-                visualAidButton.dataset.questionIndex = qIndex;
-
                 // Add a div where the hint will be displayed.
                 const hintDisplay = document.createElement('div');
                 hintDisplay.className = 'hint-display';
 
-                // Add a div for the visual aid image
-                const visualAidDisplay = document.createElement('div');
-                visualAidDisplay.className = 'visual-aid-container'; // Container for the image and its loading state
-
                 questionDiv.appendChild(hintButton);
-                questionDiv.appendChild(visualAidButton); // Append the new button
-                questionDiv.appendChild(hintDisplay);
-                questionDiv.appendChild(visualAidDisplay);
+                questionDiv.appendChild(hintDisplay); // This places it right after the button.
                 
                 textQuestionsArea.appendChild(questionDiv); // Add the full question div to the area
             });
@@ -1417,6 +1475,7 @@
         /**
          * Retrieves a subtle hint for a given multiple-choice question from the Gemini API.
          * The hint is designed to guide the user without revealing the direct answer.
+         * It iterates through the available API keys until a successful response is received.
          * @param {string} questionText The full text of the question.
          * @param {Array<string>} options An array of the answer options for the question.
          * @returns {Promise<string>} A promise that resolves with the hint text.
@@ -1446,79 +1505,49 @@
                     responseMimeType: "text/plain" // Expect plain text response for hint
                 }
             };
-            const apiKey = GEMINI_API_KEY;
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Gemini API error: ${response.status} - ${errorData.error.message || response.statusText}`);
-                }
-
-                const result = await response.json();
-                // Safely extract the hint text.
-                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
-                    const hintText = result.candidates[0].content.parts[0].text;
-                    return hintText;
-                } else {
-                    throw new Error('Invalid response structure from Gemini API when generating hint.');
-                }
-            } catch (error) {
-                console.error('Error fetching hint from Gemini:', error);
-                showMessageBox(`Could not generate a hint: ${error.message}.`);
-                return 'Sorry, I cannot provide a hint right now.'; // Fallback hint
-            } finally {
-                loadingSpinner.style.display = 'none'; // Always hide spinner
-            }
-        }
-
-        /**
-         * Generates a visual aid (image) for a given question using the Imagen API.
-         * The image is generated based on the question text and chapter context.
-         * @param {string} questionText The text of the question for which to generate a visual aid.
-         * @param {HTMLElement} targetElement The DOM element where the image should be displayed.
-         */
-        async function generateVisualAid(questionText, targetElement) {
-            targetElement.innerHTML = '<div class="loading-spinner" style="display:block; width: 20px; height: 20px;"></div><p class="text-center mt-2 text-sm">Generating visual aid...</p>';
             
-            const prompt = `Generate a simple, clear, and relevant visual representation (like an illustration or diagram) for the concept related to this question in the context of "${CHAPTER_NAME}": "${questionText}". The image should be illustrative and helpful for understanding the question, not directly answering it. Make it abstract or symbolic if a direct image is not appropriate.`;
-            
-            const payload = { instances: [{ prompt: prompt }], parameters: { "sampleCount": 1 } };
-            const apiKey = ""; // Canvas will automatically provide this in runtime
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${IMAGEN_API_MODEL}:predict?key=${apiKey}`;
+            let attempts = 0;
+            while (attempts < GEMINI_API_KEYS.length) {
+                const apiKey = GEMINI_API_KEYS[currentGeminiApiKeyIndex % GEMINI_API_KEYS.length]; // Cycle through keys
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                console.log(`Sending hint request to Gemini API with key index: ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}`);
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Imagen API error: ${response.status} - ${errorData.error.message || response.statusText}`);
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Gemini API Raw Response for Hint:', result);
+
+                        if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                            const hintText = result.candidates[0].content.parts[0].text;
+                            console.log('Generated hint:', hintText);
+                            hideMessageBox();
+                            currentGeminiApiKeyIndex = 0; // Reset index on success
+                            return hintText; // Exit function on success
+                        } else {
+                            console.warn('Invalid response structure from Gemini API when generating hint with this key.');
+                        }
+                    } else if (response.status === 403 || response.status === 400) {
+                        console.warn(`Gemini API key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}) failed with status ${response.status} for hint generation. Trying next key...`);
+                    } else {
+                        console.error(`Error fetching hint with Gemini key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}): Status ${response.status} - ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error(`Network error fetching hint with Gemini key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}):`, error);
                 }
-
-                const result = await response.json();
-                if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
-                    const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
-                    targetElement.innerHTML = `<img src="${imageUrl}" class="question-visual-aid" alt="Visual aid for question">`;
-                } else {
-                    targetElement.innerHTML = '<p class="text-red-400">Could not generate visual aid.</p>';
-                    throw new Error('Invalid response structure from Imagen API when generating image.');
-                }
-            } catch (error) {
-                console.error('Error generating visual aid:', error);
-                targetElement.innerHTML = `<p class="text-red-400">Error: ${error.message}</p>`;
-            } finally {
-                // No global loading spinner to hide here, as it's specific to the visual aid container.
+                currentGeminiApiKeyIndex++; // Move to the next key
+                attempts++;
             }
+            console.error("All Gemini API keys failed to generate hint.");
+            showMessageBox(`Could not generate a hint after trying all API keys. Please check your network or API keys.`);
+            loadingSpinner.style.display = 'none';
+            return 'Sorry, I cannot provide a hint right now.'; // Fallback if all keys fail
         }
 
 
@@ -1634,40 +1663,49 @@
                     }
                 }
             };
-            const apiKey = GEMINI_API_KEY;
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+            
+            let attempts = 0;
+            while (attempts < GEMINI_API_KEYS.length) {
+                const apiKey = GEMINI_API_KEYS[currentGeminiApiKeyIndex % GEMINI_API_KEYS.length]; // Cycle through keys
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                try {
+                    console.log(`Attempting to regenerate questions with Gemini key index: ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}`);
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Gemini API error: ${response.status} - ${errorData.error.message || response.statusText}`);
+                    if (response.ok) {
+                        const result = await response.json();
+                        const newQuestionsData = JSON.parse(result.candidates[0].content.parts[0].text);
+
+                        if (newQuestionsData && Array.isArray(newQuestionsData) && newQuestionsData.length > 0) {
+                            currentCheckpoint.text_questions = newQuestionsData; 
+                            displayTextQuestions(newQuestionsData); 
+                            hideMessageBox();
+                            currentGeminiApiKeyIndex = 0; // Reset index on success
+                            return; // Exit function on success
+                        } else {
+                            console.warn('AI could not generate new question data for the checkpoint with this key.');
+                        }
+                    } else if (response.status === 403 || response.status === 400) {
+                        console.warn(`Gemini API key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}) failed with status ${response.status} for question regeneration. Trying next key...`);
+                    } else {
+                        console.error(`Error regenerating challenge questions with Gemini key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}): Status ${response.status} - ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error(`Network error regenerating challenge questions with Gemini key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}):`, error);
                 }
-
-                const result = await response.json();
-                const newQuestionsData = JSON.parse(result.candidates[0].content.parts[0].text);
-
-                if (newQuestionsData && Array.isArray(newQuestionsData) && newQuestionsData.length > 0) {
-                    // Update the current checkpoint's questions with the newly generated ones.
-                    currentCheckpoint.text_questions = newQuestionsData; 
-                    displayTextQuestions(newQuestionsData); // Display the new questions
-                    hideMessageBox();
-                } else {
-                    throw new Error('AI could not generate new question data for the checkpoint.');
-                }
-            } catch (error) {
-                console.error('Error regenerating challenge questions:', error);
-                showMessageBox(`Could not generate new questions: ${error.message}. Please try again.`);
-            } finally {
-                loadingSpinner.style.display = 'none'; // Hide spinner
-                questionsSection.classList.remove('hidden'); // Ensure questions section is visible
-                questionsSection.classList.add('is-active');
+                currentGeminiApiKeyIndex++; // Move to the next key
+                attempts++;
             }
+            console.error("All Gemini API keys failed to regenerate questions.");
+            showMessageBox(`Could not generate new questions after trying all API keys. Please try again or check your network/API keys.`);
+            loadingSpinner.style.display = 'none'; 
+            questionsSection.classList.remove('hidden'); 
+            questionsSection.classList.add('is-active');
         }
 
         /**
@@ -1739,10 +1777,8 @@
         // Event listener for the "Mark Game as Complete" button.
         markGameCompleteBtn.addEventListener('click', markExternalGameAsComplete);
 
-        // Event delegation for "Get Hint" and "Generate Visual Aid" buttons.
-        // The listener is attached to the parent `questionsSection` for an efficiet.
+        // Event delegation for "Get Hint" button clicks.
         questionsSection.addEventListener('click', async (event) => {
-            // Handle "Get Hint" button clicks
             if (event.target.classList.contains('hint-button') && event.target.textContent.includes('Hint')) {
                 const button = event.target;
                 const qIndex = parseInt(button.dataset.questionIndex); 
@@ -1752,13 +1788,13 @@
                     return;
                 }
                 const questionData = currentCheckpoint.text_questions[qIndex];
+                
                 // Find the hint display element by checking its proximity (next sibling after button)
                 let hintDisplayElement = button.nextElementSibling;
                 // Ensure it's the actual hint display div, not another button or container
                 while(hintDisplayElement && !hintDisplayElement.classList.contains('hint-display')) {
                     hintDisplayElement = hintDisplayElement.nextElementSibling;
                 }
-
 
                 // Check if hint is already displayed to prevent redundant generation
                 if (hintDisplayElement && hintDisplayElement.textContent.trim() !== '' && hintDisplayElement.style.display !== 'none') {
@@ -1772,33 +1808,6 @@
                     hintDisplayElement.style.display = 'block'; // Make hint visible
                 }
             } 
-            // Handle "Generate Visual Aid" button clicks
-            else if (event.target.classList.contains('hint-button') && event.target.textContent.includes('Visual Aid')) {
-                const button = event.target;
-                const questionText = button.dataset.questionText;
-                
-                // Find the visual aid container. This involves finding its parent's children.
-                // The structure is: questionDiv > (p, options, hintButton, visualAidButton, hintDisplay, visualAidContainer)
-                // So, visualAidContainer is typically the next sibling after hintDisplay.
-                let visualAidContainer = button.nextElementSibling;
-                while(visualAidContainer && !visualAidContainer.classList.contains('visual-aid-container')) {
-                    visualAidContainer = visualAidContainer.nextElementSibling;
-                }
-                
-                if (!visualAidContainer) {
-                    console.error("Visual aid container not found!");
-                    showMessageBox("Error: Could not find element to display visual aid.");
-                    return;
-                }
-
-                // Prevent regenerating image if already displayed
-                if (visualAidContainer.querySelector('img')) {
-                    showMessageBox('Visual aid already generated for this question.');
-                    return;
-                }
-
-                await generateVisualAid(questionText, visualAidContainer);
-            }
         });
 
 
@@ -1816,17 +1825,20 @@
             loadGameData();
             
             // If the chapter is already completed, loadGameData will handle redirection.
-            // If it's not completed, proceed with video loading.
             if (localStorage.getItem(`chapterCompleted_${CHAPTER_NAME}_${currentUserId}`) === 'true') {
                 return; // Exit if chapter is already complete, as loadGameData has initiated redirect.
             }
 
+            // Load the YouTube Iframe API script asynchronously.
+            // This is crucial to ensure `YT.Player` is defined when `createYoutubePlayer` is called.
+            loadYoutubeIframeAPI(); 
+            
+            // Wait for the YouTube Iframe API to be ready before proceeding with video loading.
+            await youtubeApiReadyPromise;
+
             // Determine the user's language based on default coordinates (as IP fetching can be unreliable).
             const userLocation = DEFAULT_COORDS; 
             const userLanguage = getLanguageFromCountry(userLocation.countryCode);
-            
-            // Load the YouTube Iframe API script asynchronously.
-            loadYoutubeIframeAPI(); 
             
             // --- Primary Video Loading Logic ---
             let videoToLoad = null;
@@ -1840,17 +1852,20 @@
                         videoToLoad = videoDetails;
                         console.log("Successfully loaded user-provided video:", videoToLoad);
                     } else {
+                        // This else block handles cases where the user-provided video link
+                        // was valid, but YouTube API could not fetch its details (e.g., restricted video).
                         showMessageBox('User-provided video not found or could not be loaded. Falling back to search.');
                         console.warn("User-provided video failed to load, falling back to search.");
                     }
                 } else {
+                    // This else block handles cases where the user-provided string was not a valid YouTube URL.
                     showMessageBox('Invalid user-provided YouTube URL. Falling back to search.');
                     console.warn("Invalid user-provided YouTube URL, falling back to search.");
                 }
             }
 
             if (videoToLoad) {
-                // If user-provided video was successfully identified and detailed.
+                // If a valid video was identified from the user-provided link (or its details fetched successfully).
                 createYoutubePlayer(videoToLoad.id);
                 currentVideoDuration = videoToLoad.durationSeconds;
                 currentVideoTitle = videoToLoad.snippet.title;
@@ -1858,7 +1873,7 @@
                 chapterDisplay.textContent = currentVideoTitle;
                 await getCheckpoints(videoToLoad.id, currentVideoTitle, videoToLoad.snippet.description); // Pass full description
             } else {
-                // If no user-provided video or it failed, proceed with dynamic search.
+                // If no user-provided video, or it failed to load/validate, proceed with dynamic search.
                 searchYouTubeVideo(CHAPTER_NAME, userLanguage); 
             }
         };
