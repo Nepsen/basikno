@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter Explorer</title>
+    <!-- Inter font from Google Fonts for universal readability across various devices -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN for responsive and modern styling, providing utility classes for rapid development -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define your color palette using CSS variables for easy theme management and consistency */
+        :root {
+            /* Dark Mode Variables: Deep, vibrant colors for an immersive feel */
+            --dark-space: #1a0a2e; /* Deepest background color, resembling outer space */
+            --deep-purple: #4a0072; /* Main container/card background, a rich dark purple */
+            --electric-blue: #007bff; /* Vibrant accent color for highlights, buttons, and interactive elements */
+            --cosmic-purple: #8a2be2; /* Lighter purple for subtle accents and borders */
+            --light-purple: #e0b0ff; /* Lightest purple, ideal for text on dark backgrounds to ensure readability */
+            --accent-blue: #00b0ff; /* Another bright blue for strong emphasis and interactive elements */
+            --text-dark-mode: var(--light-purple); /* Default text color in dark mode */
+            --shadow-dark-mode: rgba(0, 0, 0, 0.5); /* Shadow color for depth in dark mode */
+
+            /* Light Mode Variables: Clean, softer colors for a brighter interface */
+            --light-bg: white; /* Clean white background */
+            --light-text: #333344; /* Dark grey for text on light backgrounds, ensuring contrast */
+            --light-accent: #5e35b1; /* Muted purple accent for light mode elements */
+            --light-border: #d1c4e9; /* Light purple for borders/separators in light mode */
+            --light-card: #ffffff; /* White for card backgrounds in light mode */
+            --shadow-light-mode: rgba(0, 0, 0, 0.1); /* Shadow color for depth in light mode */
+        }
+
+        /* Base body styling: sets font, background, and default text color based on theme */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-space); /* Default to dark mode background */
+            color: var(--text-dark-mode); /* Default to dark mode text color */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for theme changes */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centers content horizontally */
+            min-height: 100vh; /* Ensures body takes at least full viewport height */
+            padding: 20px;
+            box-sizing: border-box; /* Includes padding in element's total width and height */
+            line-height: 1.6; /* Optimal line height for readability */
+            font-size: 1rem; /* Base font size for global consistency */
+        }
+
+        /* Light mode specific styles: overrides dark mode defaults when 'light-mode' class is applied */
+        body.light-mode {
+            background-color: var(--light-bg);
+            color: var(--light-text);
+        }
+
+        /* Container styling: central content area with rounded corners and shadow */
+        .container {
+            background-color: var(--deep-purple); /* Container background in dark mode */
+            border-radius: 20px; /* Soft rounded corners */
+            padding: 25px;
+            box-shadow: 0 10px 30px var(--shadow-dark-mode); /* Adds depth with shadow */
+            width: 100%; /* Ensures responsiveness across screen sizes */
+            max-width: 900px; /* Limits maximum width for better readability on large screens */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for theme changes */
+        }
+
+        /* Light mode container styles */
+        body.light-mode .container {
+            background-color: var(--light-card); /* Light mode container background */
+            box-shadow: 0 10px 30px var(--shadow-light-mode); /* Light mode shadow */
+        }
+
+        /* Top controls wrapper for theme toggle and Google Translate, aligned to the right */
+        .top-controls-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Aligns items to the right */
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 20px;
+            padding: 0 10px;
+            gap: 15px; /* Space between elements */
+            flex-wrap: wrap; /* Allows items to wrap onto the next line on smaller screens */
+        }
+        
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            color: var(--text-dark-mode);
+        }
+
+        /* Light mode theme switch wrapper text color */
+        body.light-mode .theme-switch-wrapper {
+            color: var(--light-text);
+        }
+
+        /* Hidden checkbox styling for the theme switch */
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+
+        .theme-switch input {
+            display: none; /* Hides the actual checkbox input */
+        }
+
+        /* Slider track for the theme toggle */
+        .slider {
+            background-color: #ccc; /* Neutral background for the toggle track */
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s; /* Smooth transition for slider movement */
+            border-radius: 34px; /* Makes the track rounded */
+        }
+
+        /* Slider handle for the theme toggle */
+        .slider:before {
+            background-color: #fff; /* White handle */
+            bottom: 4px;
+            content: ""; /* Required for :before pseudo-element */
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s; /* Smooth transition for handle movement */
+            width: 26px;
+            border-radius: 50%; /* Makes the handle circular */
+        }
+
+        /* Styles when the theme switch is checked (activates light mode) */
+        input:checked + .slider {
+            background-color: var(--electric-blue); /* Blue track when checked */
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px); /* Moves the handle to the right when checked */
+        }
+
+        /* Google Translate Widget Styling: overrides default Google styles for theme integration */
+        #google_translate_element {
+            margin-left: 10px;
+        }
+        #google_translate_element .goog-te-gadget {
+            font-family: 'Inter', sans-serif !important; /* Forces Inter font */
+            font-size: 0.85rem !important; /* Smaller font size */
+            color: var(--text-dark-mode) !important; /* Inherits theme text color */
+            background-color: transparent !important; /* Transparent background */
+            border: 1px solid var(--cosmic-purple) !important; /* Border color for the widget */
+            border-radius: 8px; /* Rounded corners */
+            overflow: hidden; /* Ensures content stays within bounds */
+            padding: 4px;
+        }
+        /* Light mode specific styling for Google Translate widget */
+        body.light-mode #google_translate_element .goog-te-gadget {
+            color: var(--light-text) !important;
+            border: 1px solid var(--light-accent) !important;
+        }
+        /* Styling for the Google Translate dropdown combo box */
+        #google_translate_element .goog-te-gadget .goog-te-combo {
+            background-color: transparent !important;
+            color: inherit !important;
+            border: none !important;
+            outline: none !important;
+        }
+        /* Hides the Google Translate banner frame to prevent UI shifts */
+        .goog-te-banner-frame.skiptranslate {
+            display: none !important;
+        }
+        /* Resets body top margin affected by Google Translate overlay */
+        body {
+            top: 0 !important; 
+        }
+
+        /* Next Chapter Link Styling */
+        #next-chapter-link {
+            background-color: var(--cosmic-purple);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 8px rgba(138, 43, 226, 0.4);
+            display: none; /* Hidden by default, shown when chapter is complete */
+        }
+
+        /* Light mode next chapter link styles */
+        body.light-mode #next-chapter-link {
+            background-color: var(--light-accent);
+            box-shadow: 0 2px 8px rgba(94, 53, 177, 0.2);
+        }
+
+        /* Hover effect for next chapter link */
+        #next-chapter-link:hover {
+            background-color: var(--electric-blue);
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+
+        /* YouTube Player and External Game Container Styling */
+        #youtube-player, #external-game-iframe {
+            width: 100%;
+            aspect-ratio: 16 / 9; /* Maintains 16:9 aspect ratio for videos */
+            border-radius: 15px; /* Rounded corners for the player/iframe */
+            overflow: hidden; /* Clips content outside the rounded corners */
+            border: 2px solid var(--accent-blue); /* Distinct border for video player */
+            box-shadow: 0 0 15px rgba(0, 176, 255, 0.7); /* Blue glow effect around the player */
+        }
+        #external-game-container {
+            margin-top: 20px;
+            text-align: center;
+            background-color: var(--deep-purple);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px var(--shadow-dark-mode);
+        }
+        /* Light mode external game container styles */
+        body.light-mode #external-game-container {
+            background-color: var(--light-card);
+            box-shadow: 0 5px 15px var(--shadow-light-mode);
+        }
+        /* Styling for the "Mark Game as Complete" button */
+        #mark-game-complete-btn {
+            background-color: var(--accent-blue);
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 176, 255, 0.4);
+            margin-top: 20px;
+        }
+        /* Hover effect for the game complete button */
+        #mark-game-complete-btn:hover {
+            background-color: var(--electric-blue);
+            transform: translateY(-2px);
+        }
+        /* Disabled state for the game complete button */
+        #mark-game-complete-btn:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Loading spinner animation */
+        .loading-spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid var(--accent-blue);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none; /* Hidden by default */
+        }
+
+        /* Keyframe animation for the spinner */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Questions section styling: container for checkpoint challenges */
+        .questions-section { 
+            background-color: var(--deep-purple);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            width: 100%;
+            box-shadow: 0 5px 15px var(--shadow-dark-mode);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        /* Light mode questions section styles */
+        body.light-mode .questions-section {
+            background-color: var(--light-card);
+            box-shadow: 0 5px 15px var(--shadow-light-mode);
+        }
+
+        /* Styles for the area containing multiple text questions */
+        .text-questions-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Space between individual question items */
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: rgba(74, 0, 114, 0.5); /* Semi-transparent background */
+            border-radius: 10px;
+            border: 1px solid var(--cosmic-purple);
+        }
+        /* Light mode text questions area styles */
+        body.light-mode .text-questions-area {
+            background-color: var(--light-border);
+            border: 1px solid var(--light-accent);
+        }
+
+        /* Styling for individual question items */
+        .text-question-item {
+            padding: 10px;
+            background-color: rgba(74, 0, 114, 0.7); /* Slightly darker semi-transparent background */
+            border-radius: 8px;
+            color: var(--text-dark-mode);
+        }
+        /* Light mode text question item styles */
+        body.light-mode .text-question-item {
+            background-color: var(--light-card);
+            color: var(--light-text);
+        }
+        .text-question-item p {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .text-question-options label {
+            display: block; /* Each option on a new line */
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        .text-question-options input[type="radio"] {
+            margin-right: 8px;
+            accent-color: var(--accent-blue); /* Colors the radio button itself */
+            transform: scale(1.1); /* Slightly enlarges radio buttons for easier tapping */
+        }
+
+        /* Styling for the "Submit Challenge" button */
+        #submit-challenge-btn {
+            background-color: var(--accent-blue);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 176, 255, 0.4);
+            margin-top: 20px;
+        }
+        /* Hover effect for submit button */
+        #submit-challenge-btn:hover {
+            background-color: var(--electric-blue);
+            transform: translateY(-2px);
+        }
+        /* Disabled state for submit button */
+        #submit-challenge-btn:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Modern Message Box Styles: used for custom alerts instead of browser's alert() */
+        .message-box {
+            display: none; /* Hidden by default */
+            position: fixed; /* Fixed position relative to the viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+            display: flex; /* Centers content using flexbox */
+            align-items: center;
+            justify-content: center;
+            z-index: 1000; /* Ensures it's on top of all other content */
+            backdrop-filter: blur(5px); /* Adds a subtle blur effect to background */
+        }
+
+        /* Content area of the message box */
+        .message-box-content {
+            background-color: var(--deep-purple);
+            color: var(--text-dark-mode);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-dark-mode);
+            max-width: 400px;
+            text-align: center;
+            transform: scale(0.9); /* Starts slightly smaller */
+            animation: popIn 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Pop-in animation */
+        }
+
+        /* Light mode message box content styles */
+        body.light-mode .message-box-content {
+            background-color: var(--light-card);
+            color: var(--light-text);
+            box-shadow: 0 10px 30px var(--shadow-light-mode);
+        }
+
+        /* Keyframe animation for the pop-in effect */
+        @keyframes popIn {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .message-box-content p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* OK button inside the message box */
+        .message-box-content button {
+            background-color: var(--accent-blue);
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 176, 255, 0.4);
+        }
+
+        /* Hover effect for message box button */
+        .message-box-content button:hover {
+            background-color: var(--electric-blue);
+            transform: translateY(-2px);
+        }
+
+        /* Styling for the "Get Hint" button */
+        .hint-button {
+            background-color: var(--electric-blue);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem; /* Smaller font for hint button */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+            margin-top: 10px; /* Space from options */
+            display: inline-block; /* Allows it to sit nicely with text */
+            margin-right: 10px; /* Space between hint and visual aid buttons */
+        }
+        /* Hover effect for hint button */
+        .hint-button:hover {
+            background-color: var(--accent-blue);
+            transform: translateY(-1px);
+        }
+
+        /* Styling for the hint display area */
+        .hint-display {
+            background-color: rgba(0, 176, 255, 0.1); /* Light blue background for hint */
+            border-left: 4px solid var(--accent-blue); /* Left border for visual emphasis */
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+            color: var(--text-dark-mode); /* Ensures text is readable */
+            font-size: 0.9rem;
+            font-style: italic;
+            display: none; /* Hidden by default, shown when hint is generated */
+        }
+        /* Light mode hint display styles */
+        body.light-mode .hint-display {
+            background-color: rgba(94, 53, 177, 0.1);
+            border-left-color: var(--light-accent);
+        }
+
+        /* Styles for generated visual aids (images) */
+        .question-visual-aid {
+            max-width: 100%; /* Ensures image is responsive within its container */
+            height: auto; /* Maintains aspect ratio */
+            border-radius: 12px; /* Rounded corners matching theme */
+            margin-top: 15px; /* Space from buttons/question text */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Subtle shadow for depth */
+            border: 1px solid var(--cosmic-purple); /* Border for visual separation */
+            display: block; /* Ensures it takes up full width for centering */
+            margin-left: auto; /* Centers the image */
+            margin-right: auto; /* Centers the image */
+        }
+        body.light-mode .question-visual-aid {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--light-accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="top-controls-wrapper">
+        <a id="next-chapter-link" href="math1.html">Go to Next Chapter</a>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+            <span class="ml-2">Dark/Light Mode</span>
+        </div>
+        <!-- Google Translate Element will be initialized here dynamically -->
+        <div id="google_translate_element"></div>
+    </div>
+
+    <div class="container">
+        <h1 class="text-3xl font-bold text-center mb-6">Chapter Explorer</h1>
+        <div id="youtube-player"></div>
+        <div class="loading-spinner" id="loading-spinner"></div>
+
+        <div id="video-info" class="mt-4 text-center text-sm">
+            <p><strong>Current Chapter:</strong> <span id="chapter-display"></span></p>
+            <p><strong>Current Score:</strong> <span id="score-display">0</span></p>
+            <p><strong>Level Progress:</strong> <span id="level-display">0</span></p>
+            <p><strong>User ID:</strong> <span id="user-id-display">Loading...</span></p>
+        </div>
+
+        <div id="questions-section" class="questions-section mt-6 hidden">
+            <h2 class="text-2xl font-bold mb-4 text-center">Checkpoint Challenge</h2>
+            
+            <!-- Area where individual checkpoint questions will be dynamically loaded -->
+            <div id="text-questions-area" class="text-questions-area"></div>
+
+            <button id="submit-challenge-btn" disabled>Submit Challenge</button>
+        </div>
+
+        <!-- Final Game Challenge Section: displays an external game in an iframe -->
+        <div id="external-game-container" class="hidden">
+            <h2 class="text-2xl font-bold mb-4 text-center">Final Game Challenge!</h2>
+            <p>Interact with the game below to complete this chapter.</p>
+            <iframe id="external-game-iframe" frameborder="0" allowfullscreen></iframe>
+            <button id="mark-game-complete-btn">Mark Game as Complete</button>
+        </div>
+    </div>
+
+    <!-- Custom Message Box HTML: Replaces standard alert/confirm dialogs -->
+    <div id="message-box" class="message-box">
+        <div class="message-box-content">
+            <p id="message-text"></p>
+            <button id="message-ok-btn">OK</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- API Keys & External Links Configuration ---
+        // IMPORTANT: Replace 'YOUR_YOUTUBE_API_KEY_HERE' with your actual YouTube Data API Key.
+        // Get one from Google Cloud Console (APIs & Services -> Credentials -> Create credentials -> API Key).
+        const YOUTUBE_API_KEY = 'AIzaSyBNGX-ctd1bHFfKR1chi_xx6it7gaTbZOM'; 
+        // GEMINI_API_KEY is automatically provided by the Canvas environment for gemini-2.0-flash.
+        const GEMINI_API_KEY = "AIzaSyBrLFORMIa1Q73eot8KveqhFgHqpglI6YA"; 
+        const GEMINI_MODEL = "gemini-2.0-flash"; // Specify the Gemini text model to use.
+        const IMAGEN_API_MODEL = "imagen-3.0-generate-002"; // Specify the Imagen model for image generation.
+
+
+        // --- USER CONFIGURABLE: PRIMARY VIDEO LINK ---
+        // If provided and valid, the app will attempt to load this video first.
+        // If left empty or invalid, it will fall back to searching based on CHAPTER_NAME.
+        // Example: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        const USER_PROVIDED_VIDEO_LINK = ''; 
+
+
+        // URL for the next chapter page. Update this as your learning path progresses.
+        const NEXT_CHAPTER_URL = 'math1.html'; 
+        // Placeholder for an external interactive game. Replace with a live URL to your game.
+        // Example: 'https://your-domain.com/your-game/index.html' or 'https://example.itch.io/your-game'
+        const EXTERNAL_GAME_URL = 'https://placehold.co/600x400/000000/FFFFFF?text=YOUR_GAME_URL_HERE'; 
+
+        // Default coordinates and language information. Used as a fallback if geo-location fails.
+        const DEFAULT_COORDS = { latitude: 21.4225, longitude: 39.8262, city: 'Makkah', country: 'Saudi Arabia', countryCode: 'SA' };
+
+        // Define the current chapter's name. This is crucial as a keyword for YouTube video searches.
+        // It helps find relevant content even if video titles don't exactly match.
+        const CHAPTER_NAME = 'Counting Numbers for Beginners'; 
+
+        // --- DOM Element References ---
+        // Caching DOM elements improves performance by reducing repeated lookups.
+        const body = document.body;
+        const themeToggle = document.getElementById('theme-toggle');
+        const nextChapterLink = document.getElementById('next-chapter-link');
+        const youtubePlayerDiv = document.getElementById('youtube-player');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const questionsSection = document.getElementById('questions-section'); 
+        const chapterDisplay = document.getElementById('chapter-display');
+        const scoreDisplay = document.getElementById('score-display');
+        const levelDisplay = document.getElementById('level-display');
+        const userIdDisplay = document.getElementById('user-id-display');
+
+        // Custom Message Box Elements for user feedback (replacing browser's alert/confirm)
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const messageOkBtn = document.getElementById('message-ok-btn');
+
+        // Checkpoint Challenge related elements
+        const textQuestionsArea = document.getElementById('text-questions-area');
+        const submitChallengeBtn = document.getElementById('submit-challenge-btn'); 
+
+        // External Game related elements
+        const externalGameContainer = document.getElementById('external-game-container');
+        const externalGameIframe = document.getElementById('external-game-iframe');
+        const markGameCompleteBtn = document.getElementById('mark-game-complete-btn');
+
+        // --- Global State Variables ---
+        // These variables hold the current state of the application.
+        let player; // Holds the YouTube Player API instance
+        let currentVideoId = ''; // Stores the ID of the currently playing YouTube video
+        let currentVideoDuration = 0; // Stores the duration of the current video in seconds
+        let currentVideoTitle = ''; // Stores the title of the current video
+        let currentVideoDescription = ''; // Stores the description of the current video
+        let checkpoints = []; // Array to store generated checkpoints and their associated questions
+        let currentCheckpointIndex = -1; // Tracks the user's progress through checkpoints
+        let lastPlayedTime = 0; // Stores the last known playback time of the video, for resuming
+        let lastCheckpointTime = 0; // Stores the video time when the last checkpoint was triggered
+
+        // Unique user ID, persisted in Local Storage to track individual progress
+        let currentUserId = localStorage.getItem('chapter_app_userId') || crypto.randomUUID(); 
+        // If it's a new user, save the generated ID to Local Storage
+        if (!localStorage.getItem('chapter_app_userId')) {
+            localStorage.setItem('chapter_app_userId', currentUserId);
+        }
+        // Display a shortened version of the user ID in the UI for clarity
+        userIdDisplay.textContent = currentUserId.substring(0, 8) + '...'; 
+
+        // Global State Variables for current chapter progress (for 80% rule)
+        let correctQuestionsInCurrentChapter = 0;
+        let totalQuestionsAttemptedInCurrentChapter = 0;
+        const CHAPTER_PASS_SCORE_PERCENTAGE = 80; // Required percentage to pass a chapter without the game
+
+
+        // --- Game Data Management Functions (using Local Storage for persistence) ---
+
+        /**
+         * Loads user game data (score, level, and chapter-specific progress) from Local Storage.
+         * Initializes UI displays based on loaded data. Handles cases where data might be missing or corrupted.
+         */
+        function loadGameData() {
+            // Check if this specific chapter is already marked as completed for the current user.
+            const isChapterCompleted = localStorage.getItem(`chapterCompleted_${CHAPTER_NAME}_${currentUserId}`);
+            if (isChapterCompleted === 'true') {
+                showMessageBox(`Chapter "${CHAPTER_NAME}" is already completed! Redirecting to the next chapter.`);
+                // Construct a full URL for navigation using window.location.href as the base
+                const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                setTimeout(() => {
+                    window.location.href = currentPath + NEXT_CHAPTER_URL;
+                }, 3000); 
+                return; // Exit function if chapter is already complete.
+            }
+
+            // Load and parse total score. Includes error handling for invalid JSON.
+            const storedScores = localStorage.getItem('scoreofbasikno');
+            let currentTotalScore = 0;
+            if (storedScores) {
+                try {
+                    const parsedScores = JSON.parse(storedScores);
+                    if (Array.isArray(parsedScores)) { // Ensure it's an array
+                        currentTotalScore = parsedScores.reduce((sum, item) => sum + (item.score || 0), 0);
+                    } else {
+                        console.error("Stored score data is not an array, resetting.");
+                        localStorage.setItem('scoreofbasikno', '[]'); // Reset if invalid format
+                    }
+                } catch (e) {
+                    console.error("Error parsing score data from localStorage, resetting.", e);
+                    localStorage.setItem('scoreofbasikno', '[]'); // Reset if JSON parsing fails
+                }
+            } else {
+                localStorage.setItem('scoreofbasikno', '[]'); // Initialize as empty array if not present
+            }
+            scoreDisplay.textContent = currentTotalScore; // Update score display
+
+            // Load and parse current level. Handles potential NaN values.
+            let currentLevel = parseInt(localStorage.getItem('levelofbasikno')) || 0;
+            if (isNaN(currentLevel)) { 
+                currentLevel = 0; // Default to 0 if parsing results in NaN
+                localStorage.setItem('levelofbasikno', '0'); // Store default back to local storage
+            }
+            levelDisplay.textContent = currentLevel; // Update level display
+
+            // Load chapter-specific progress (current checkpoint, last played time, and question counts)
+            const chapterProgressKey = `chapterProgress_${CHAPTER_NAME}_${currentUserId}`;
+            const savedChapterProgress = JSON.parse(localStorage.getItem(chapterProgressKey)) || {};
+
+            currentCheckpointIndex = savedChapterProgress.currentCheckpointIndex !== undefined ? savedChapterProgress.currentCheckpointIndex : -1;
+            lastCheckpointTime = savedChapterProgress.lastCheckpointTime !== undefined ? savedChapterProgress.lastCheckpointTime : 0;
+            correctQuestionsInCurrentChapter = savedChapterProgress.correctQuestions || 0;
+            totalQuestionsAttemptedInCurrentChapter = savedChapterProgress.totalQuestions || 0;
+            
+            console.log('Game data loaded from Local Storage:', { 
+                score: scoreDisplay.textContent, 
+                level: levelDisplay.textContent, 
+                savedChapterProgress, 
+                correctQuestionsInCurrentChapter, 
+                totalQuestionsAttemptedInCurrentChapter 
+            });
+        }
+
+        /**
+         * Saves the current game progress (current checkpoint index and video playback time) to Local Storage.
+         * This ensures progress is retained across sessions. Also saves chapter question counts.
+         */
+        function saveGameData() {
+            const chapterProgressKey = `chapterProgress_${CHAPTER_NAME}_${currentUserId}`;
+            const progressData = {
+                currentCheckpointIndex: currentCheckpointIndex,
+                lastCheckpointTime: lastCheckpointTime,
+                correctQuestions: correctQuestionsInCurrentChapter,
+                totalQuestions: totalQuestionsAttemptedInCurrentChapter
+            };
+            localStorage.setItem(chapterProgressKey, JSON.stringify(progressData)); // Stringify object for storage
+            console.log('Game progress saved to Local Storage:', progressData);
+        }
+
+        /**
+         * Updates the user's score in Local Storage and on the UI.
+         * Scores are stored as an array of objects, allowing for detailed history if needed.
+         * @param {number} pointsToAdd The number of points to add for this specific event.
+         * @param {string} type The type of score event (e.g., 'question', 'checkpoint_bonus', 'game', 'chapter_completion').
+         */
+        function updateScore(pointsToAdd, type = 'question') {
+            let scoresArray = [];
+            const storedScores = localStorage.getItem('scoreofbasikno');
+            if (storedScores) {
+                try {
+                    scoresArray = JSON.parse(storedScores);
+                    if (!Array.isArray(scoresArray)) scoresArray = []; // Ensure it's an array
+                } catch (e) {
+                    console.error("Error parsing score data from localStorage for update, starting fresh.", e);
+                    scoresArray = [];
+                }
+            }
+            
+            // Add a new score entry, including the chapter name (subject), score, type, and date.
+            scoresArray.push({
+                subject: CHAPTER_NAME, // 'subject' key aligns with potential external score tracking
+                score: pointsToAdd,
+                type: type, 
+                date: new Date().toISOString() // ISO string for consistent date format
+            });
+
+            localStorage.setItem('scoreofbasikno', JSON.stringify(scoresArray)); // Save updated array
+
+            // Recalculate total score from the array for accurate display
+            const totalScore = scoresArray.reduce((sum, item) => sum + (item.score || 0), 0);
+            scoreDisplay.textContent = totalScore; // Update UI
+            console.log('Score updated:', totalScore);
+        }
+
+        /**
+         * Updates the user's level in Local Storage and on the UI.
+         * @param {number} levelsToAdd The number of levels to add.
+         */
+        function updateLevel(levelsToAdd) {
+            let currentLevel = parseInt(localStorage.getItem('levelofbasikno')) || 0;
+            currentLevel += levelsToAdd;
+            localStorage.setItem('levelofbasikno', currentLevel.toString()); // Store as string
+            levelDisplay.textContent = currentLevel; // Update UI
+            console.log('Level updated:', currentLevel);
+        }
+
+        /**
+         * Calculates the percentage of correct answers for the current chapter.
+         * @returns {number} The percentage (0-100).
+         */
+        function getChapterCompletionPercentage() {
+            if (totalQuestionsAttemptedInCurrentChapter === 0) return 0;
+            return (correctQuestionsInCurrentChapter / totalQuestionsAttemptedInCurrentChapter) * 100;
+        }
+
+        /**
+         * Marks the current chapter as complete, awards final points, updates level, and redirects to the next chapter.
+         */
+        function markChapterComplete() {
+            // Check if the chapter was already marked complete to prevent duplicate actions
+            const isChapterCompleted = localStorage.getItem(`chapterCompleted_${CHAPTER_NAME}_${currentUserId}`);
+            if (isChapterCompleted === 'true') {
+                console.log(`Chapter "${CHAPTER_NAME}" already marked completed. Skipping re-marking.`);
+                return;
+            }
+
+            updateScore(50, 'chapter_completion'); // Award bonus points for chapter completion
+            updateLevel(1); // Increment user level
+
+            // Mark the current chapter as completed in Local Storage for the current user.
+            localStorage.setItem(`chapterCompleted_${CHAPTER_NAME}_${currentUserId}`, 'true');
+
+            showMessageBox(`Congratulations! You've successfully completed Chapter "${CHAPTER_NAME}"! Redirecting to the next chapter...`);
+            
+            // Construct a full URL for navigation using window.location.href as the base
+            const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+            setTimeout(() => {
+                window.location.href = currentPath + NEXT_CHAPTER_URL;
+            }, 2000); 
+            
+            // Hide all main content sections during redirect
+            youtubePlayerDiv.classList.add('hidden');
+            questionsSection.classList.add('hidden');
+            externalGameContainer.classList.add('hidden');
+            loadingSpinner.style.display = 'none';
+        }
+
+
+        // --- Google Translate Initialization ---
+        // This function is globally exposed as per Google Translate API requirements.
+        window.googleTranslateElementInit = function() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en', // Defines the original language of your page content
+                includedLanguages: 'en,ar,bn,es,fr,de,zh-CN', // List of languages offered to the user
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE, // Simple dropdown layout
+                autoDisplay: false // Prevents automatic display of the widget
+            }, 'google_translate_element'); // ID of the DOM element to render the widget into
+        };
+        // Dynamically load the Google Translate script to prevent blocking HTML parsing.
+        const translateScript = document.createElement('script');
+        translateScript.type = 'text/javascript';
+        translateScript.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        document.head.appendChild(translateScript);
+
+        // --- Utility Helper Functions ---
+
+        /**
+         * Displays a custom message box to the user with a given message.
+         * This replaces standard browser alert() for better UI control and theming.
+         * @param {string} message The text message to display inside the box.
+         */
+        function showMessageBox(message) {
+            messageText.textContent = message;
+            messageBox.style.display = 'flex'; // Make the message box visible and center its content
+        }
+
+        /**
+         * Hides the custom message box.
+         */
+        function hideMessageBox() {
+            messageBox.style.display = 'none';
+        }
+
+        /**
+         * Extracts YouTube video ID from a given URL.
+         * Supports various YouTube URL formats.
+         * @param {string} url The full YouTube video URL.
+         * @returns {string|null} The video ID or null if not found.
+         */
+        function getYouTubeVideoId(url) {
+            const regex = /(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|v\/|)([\w-]{11})(?:\S+)?/;
+            const match = url.match(regex);
+            return match ? match[1] : null;
+        }
+
+        /**
+         * Converts a two-letter country code into a common language code.
+         * This is a simplified mapping for determining the preferred video language.
+         * @param {string} countryCode Two-letter ISO country code (e.g., 'BD' for Bangladesh, 'US' for USA).
+         * @returns {string} Corresponding two-letter language code (e.g., 'bn' for Bengali, 'en' for English).
+         */
+        function getLanguageFromCountry(countryCode) {
+            switch (countryCode) {
+                case 'BD': return 'bn'; // Bangladesh -> Bengali
+                case 'SA': return 'ar'; // Saudi Arabia -> Arabic
+                case 'US': case 'GB': case 'CA': case 'AU': return 'en'; // English speaking countries
+                default: return 'en'; // Default to English if no specific mapping is found
+            }
+        }
+
+        /**
+         * Dynamically loads the YouTube Iframe API script.
+         * This script is essential for embedding and programmatically controlling YouTube videos.
+         */
+        function loadYoutubeIframeAPI() {
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        }
+
+        /**
+         * Callback function automatically called by the YouTube Iframe API when it's fully loaded.
+         * The YouTube player instance is initialized within `searchYouTubeVideo` once a video ID is successfully found.
+         */
+        window.onYouTubeIframeAPIReady = function() {
+            // This function exists to fulfill the YouTube API requirement.
+            // The actual player creation is handled by `createYoutubePlayer`
+            // which is called after a video ID is retrieved by `searchYouTubeVideo`.
+        };
+
+        /**
+         * Creates or updates the YouTube player with a specified video ID.
+         * If a player already exists, it loads the new video; otherwise, it creates a new player instance.
+         * @param {string} videoId The YouTube video ID to load and play.
+         */
+        function createYoutubePlayer(videoId) {
+            // Defensive check: ensure YT and YT.Player are defined before attempting to create/load.
+            if (typeof YT !== 'undefined' && typeof YT.Player === 'function') {
+                if (player) {
+                    // If a player already exists, simply load the new video by ID.
+                    player.loadVideoById(videoId);
+                } else {
+                    // If no player exists, create a new one, embedding it into the 'youtube-player' div.
+                    player = new YT.Player('youtube-player', {
+                        videoId: videoId,
+                        playerVars: {
+                            'autoplay': 1, // Automatically starts playing the video when loaded
+                            'controls': 1, // Displays player controls (play/pause, volume, etc.)
+                            'rel': 0, // Prevents showing related videos at the end
+                            'modestbranding': 1 // Uses a minimalist YouTube logo
+                        },
+                        events: {
+                            'onReady': onPlayerReady, // Callback when the player finishes loading
+                            'onStateChange': onPlayerStateChange // Callback for changes in playback state
+                        }
+                    });
+                }
+                currentVideoId = videoId; // Update global state with the new video ID
+            } else {
+                console.error("YT.Player is not defined. YouTube Iframe API might not be loaded yet or failed.");
+                showMessageBox("Error: YouTube player failed to load. Please refresh the page.");
+            }
+        }
+
+        /**
+         * Callback function executed when the YouTube player is ready to begin playing.
+         * Sets initial video state, handles resuming from saved progress, and starts monitoring.
+         * @param {Object} event The event object provided by the YouTube API.
+         */
+        function onPlayerReady(event) {
+            console.log('YouTube player ready!');
+            currentVideoDuration = player.getDuration(); // Get total video duration
+            console.log('Video duration:', currentVideoDuration, 'seconds');
+            
+            // Resume video from the last checkpoint if available, otherwise start from the beginning.
+            if (lastCheckpointTime > 0) {
+                lastPlayedTime = lastCheckpointTime;
+                player.seekTo(lastPlayedTime, true); // Seek to the specific time
+                showMessageBox(`Resuming chapter "${CHAPTER_NAME}" from ${formatTime(lastPlayedTime)}.`);
+            } else {
+                showMessageBox(`Starting chapter "${CHAPTER_NAME}". Enjoy!`);
+            }
+            loadingSpinner.style.display = 'none'; // Hide the loading indicator
+            player.playVideo(); // Start video playback
+
+            // Set up a continuous interval to check video progress for checkpoint triggers.
+            setInterval(monitorVideoTime, 1000); // Check every second
+        }
+
+        /**
+         * Callback function executed when the YouTube player's state changes (e.g., playing, paused, ended).
+         * Manages UI visibility and video behavior based on playback state.
+         * @param {Object} event The event object from the YouTube API.
+         */
+        function onPlayerStateChange(event) {
+            // YT.PlayerState.ENDED (0): Video has finished playing.
+            // YT.PlayerState.PLAYING (1): Video is currently playing.
+            // YT.PlayerState.PAUSED (2): Video is paused.
+
+            if (event.data === YT.PlayerState.ENDED) {
+                console.log('Video ended.');
+                const chapterPercentage = getChapterCompletionPercentage();
+
+                // Condition for chapter completion at video end:
+                // 1. All checkpoints have been encountered AND overall chapter percentage is met.
+                // OR
+                // 2. Even if not all checkpoints were encountered, if the overall score is high enough.
+                if (currentCheckpointIndex >= checkpoints.length - 1 && chapterPercentage >= CHAPTER_PASS_SCORE_PERCENTAGE) {
+                    showMessageBox(`Video completed and your overall performance (${chapterPercentage.toFixed(0)}%) is excellent! You completed the chapter.`);
+                    markChapterComplete(); // Skip game, go straight to next chapter
+                } else if (chapterPercentage >= CHAPTER_PASS_SCORE_PERCENTAGE) {
+                    // This is the case where video ended, and percentage is met, but perhaps not all checkpoints were hit.
+                    // This caters to "if hae 80% so the learn end before game"
+                    showMessageBox(`Video completed and your overall performance (${chapterPercentage.toFixed(0)}%) is excellent! You completed the chapter.`);
+                    markChapterComplete();
+                }
+                else {
+                    // If video ended but chapter not complete (score not met or checkpoints remaining)
+                    showMessageBox(`The video ended, but your overall chapter progress is ${chapterPercentage.toFixed(0)}%. Please review the video from the beginning to improve your understanding and try the remaining checkpoints. Click play to restart.`);
+                    player.seekTo(0, true); // Restart video from 0:00
+                    player.setVolume(100); // Ensure volume is on for restart
+                    // Player remains paused, user needs to click play.
+                }
+            } else if (event.data === YT.PlayerState.PLAYING) {
+                // When video is playing, hide question and game sections.
+                questionsSection.classList.add('hidden');
+                questionsSection.classList.remove('is-active'); // Removes an active state class
+                externalGameContainer.classList.add('hidden'); // Hide the final game challenge
+                if (player) player.setPlaybackRate(1); // Ensures normal playback speed
+            }
+        }
+
+        /**
+         * Periodically monitors the video's current playback time to trigger checkpoints.
+         * Pauses the video and displays questions when a checkpoint timestamp is reached.
+         */
+        function monitorVideoTime() {
+            // Conditions to skip monitoring: player not ready, no checkpoints, or questions already active.
+            if (!player || typeof player.getCurrentTime !== 'function' || checkpoints.length === 0 || questionsSection.classList.contains('is-active')) {
+                return;
+            }
+
+            const currentTime = player.getCurrentTime();
+            lastPlayedTime = currentTime; // Update the last recorded playback time.
+
+            // Find the next checkpoint that hasn't been passed yet and whose timestamp has been reached.
+            const nextCheckpoint = checkpoints.find((cp, index) => {
+                return index > currentCheckpointIndex && currentTime >= cp.timestamp;
+            });
+
+            if (nextCheckpoint) {
+                currentCheckpointIndex = checkpoints.indexOf(nextCheckpoint); // Update the index of the active checkpoint
+                lastCheckpointTime = nextCheckpoint.timestamp; // Store the exact timestamp for resuming playback
+                
+                player.pauseVideo(); // Pause video for the checkpoint challenge
+                player.setVolume(0); // Mute video during checkpoint
+                
+                displayTextQuestions(nextCheckpoint.text_questions); // Display the questions for this checkpoint
+                questionsSection.classList.remove('hidden'); // Show the questions section
+                questionsSection.classList.add('is-active'); // Mark as active for CSS styling/logic
+                showMessageBox(`Checkpoint reached at ${formatTime(nextCheckpoint.timestamp)}! Answer all questions to continue.`);
+                saveGameData(); // Save game progress after hitting a checkpoint
+            }
+        }
+
+        /**
+         * Calculates a numerical relevance score for a video based on how well its title and description
+         * match keywords from the current chapter name.
+         * @param {string} videoTitle The title of the YouTube video.
+         * @param {string} videoDescription The description of the YouTube video.
+         * @param {string} chapterName The name/keyword of the current chapter.
+         * @returns {number} A relevance score (higher means more relevant).
+         */
+        function calculateRelevance(videoTitle, videoDescription, chapterName) {
+            // Split chapter name into significant keywords, filtering out common short words.
+            const chapterKeywords = chapterName.toLowerCase().split(/\s+/)
+                                        .filter(word => word.length > 2 && !['and', 'for', 'the', 'a', 'an', 'of', 'in', 'to', 'with', 'is', 'are', 'you', 'your'].includes(word));
+            let score = 0;
+            // Combine title and description into a single string for keyword searching.
+            const combinedText = (videoTitle + ' ' + videoDescription).toLowerCase();
+
+            // Award points for each keyword found in the video's combined text.
+            chapterKeywords.forEach(keyword => {
+                if (combinedText.includes(keyword)) {
+                    score += 2; // Each match adds to relevance.
+                }
+            });
+
+            // Provide a significant bonus for an exact match of the chapter name in the video title.
+            if (videoTitle.toLowerCase().includes(chapterName.toLowerCase())) {
+                score += 5;
+            }
+
+            return score;
+        }
+
+        /**
+         * Fetches YouTube video details (snippet, contentDetails) for a given video ID.
+         * @param {string} videoId The YouTube video ID.
+         * @returns {Promise<Object|null>} A promise resolving to a video details object or null if not found/error.
+         */
+        async function fetchVideoDetailsById(videoId) {
+            if (!videoId) return null;
+            const videoDetailsUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${YOUTUBE_API_KEY}`;
+            try {
+                const response = await fetch(videoDetailsUrl);
+                const data = await response.json();
+                if (data.items && data.items.length > 0) {
+                    const videoDetails = data.items[0];
+                    const durationSeconds = parseYouTubeDuration(videoDetails.contentDetails.duration);
+                    return {
+                        id: videoId,
+                        snippet: videoDetails.snippet,
+                        durationSeconds: durationSeconds,
+                        relevanceScore: calculateRelevance(videoDetails.snippet.title, videoDetails.snippet.description, CHAPTER_NAME) // Calculate relevance even for direct link
+                    };
+                }
+            } catch (error) {
+                console.error(`Error fetching details for video ID ${videoId}:`, error);
+            }
+            return null;
+        }
+
+        /**
+         * Fetches YouTube videos with details including duration and relevance score.
+         * Always fetches with `videoDuration: 'any'` to get the broadest possible set of videos initially.
+         * @param {string} query The search query string for YouTube.
+         * @param {number} maxResults The maximum number of search results to request from the API.
+         * @returns {Promise<Array<Object>>} A promise resolving to an array of video objects,
+         * each containing id, snippet, durationSeconds, and relevanceScore.
+         */
+        async function fetchVideosWithDetails(query, maxResults) {
+            // Constructs the YouTube Data API search URL.
+            // `videoDuration` is set to 'any' to ensure all relevant videos are fetched initially,
+            // regardless of their length, for later custom filtering.
+            const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&order=viewCount&maxResults=${maxResults}&key=${YOUTUBE_API_KEY}`;
+            
+            console.log(`Attempting to fetch videos with query: "${query}"`);
+            const response = await fetch(youtubeApiUrl); // Make the API call
+            const data = await response.json(); // Parse the JSON response
+
+            const videosWithCalculatedDetails = [];
+            // Process search results if items are found and are videos.
+            if (data.items && data.items.length > 0) {
+                for (const item of data.items.filter(i => i.id.kind === 'youtube#video')) {
+                    try {
+                        // Fetch detailed information for each video to get accurate duration.
+                        const videoDetailsUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${item.id.videoId}&key=${YOUTUBE_API_KEY}`;
+                        const detailsResponse = await fetch(videoDetailsUrl);
+                        const detailsData = await detailsResponse.json();
+
+                        if (detailsData.items && detailsData.items.length > 0) {
+                            const videoDetails = detailsData.items[0];
+                            // Parse ISO 8601 duration to seconds.
+                            const durationSeconds = parseYouTubeDuration(videoDetails.contentDetails.duration);
+                            // Calculate relevance based on chapter name.
+                            const relevanceScore = calculateRelevance(videoDetails.snippet.title, videoDetails.snippet.description, CHAPTER_NAME);
+                            
+                            // Add processed video details to the array.
+                            videosWithCalculatedDetails.push({
+                                id: item.id.videoId,
+                                snippet: videoDetails.snippet,
+                                durationSeconds: durationSeconds,
+                                relevanceScore: relevanceScore
+                            });
+                        }
+                    } catch (detailError) {
+                        console.warn(`Could not fetch details for video ${item.id.videoId}:`, detailError);
+                    }
+                }
+            }
+            return videosWithCalculatedDetails; // Return the enriched list of videos
+        }
+
+
+        /**
+         * Searches for a relevant YouTube video based on the chapter name and user's language.
+         * This function implements a robust, multi-phase search strategy, progressively
+         * relaxing criteria (animated, non-animated, language, duration) until a suitable video is found.
+         * It prioritizes relevance and longer duration.
+         * @param {string} chapterName The keyword representing the chapter content.
+         * @param {string} userLanguage The two-letter language code (e.g., 'bn', 'en').
+         */
+        async function searchYouTubeVideo(chapterName, userLanguage) {
+            loadingSpinner.style.display = 'block'; // Show loading spinner
+            chapterDisplay.textContent = `Searching for: ${chapterName}...`; // Update UI message
+
+            let bestVideo = null;
+            // Define minimum duration thresholds in seconds
+            const minDuration30Min = 30 * 60; 
+            const minDuration15Min = 15 * 60; 
+            const minDuration5Min = 5 * 60;   
+
+            // Define a sequence of search attempts, ordered by preference (most specific to most general)
+            const searchAttempts = [
+                // Phase 1: Prioritize 30+ minute videos
+                // Attempt 1.1: Animated, User Language, 30+ min
+                { querySuffix: `animated tutorial ${userLanguage}`, targetMinDuration: minDuration30Min, maxResults: 25, message: `Searching for animated, 30+ min videos in ${userLanguage}...` },
+                // Attempt 1.2: Non-animated, User Language, 30+ min
+                { querySuffix: `tutorial ${userLanguage}`, targetMinDuration: minDuration30Min, maxResults: 25, message: `No animated 30+ min video. Searching for non-animated, 30+ min videos in ${userLanguage}...` },
+                // Attempt 1.3: Animated, English Fallback, 30+ min
+                { querySuffix: `animated tutorial English`, targetMinDuration: minDuration30Min, maxResults: 25, message: `No 30+ min video in ${userLanguage}. Searching for animated, 30+ min videos in English...` },
+                // Attempt 1.4: Non-animated, English Fallback, 30+ min
+                { querySuffix: `tutorial English`, targetMinDuration: minDuration30Min, maxResults: 25, message: `No animated 30+ min video in English. Searching for non-animated, 30+ min videos in English...` },
+
+                // Phase 2: If no 30+ min video found, target 15+ minute videos
+                // Attempt 2.1: Animated, User Language, 15+ min
+                { querySuffix: `animated tutorial ${userLanguage}`, targetMinDuration: minDuration15Min, maxResults: 25, message: `No very long video. Searching for animated, 15+ min videos in ${userLanguage}...` },
+                // Attempt 2.2: Non-animated, User Language, 15+ min
+                { querySuffix: `tutorial ${userLanguage}`, targetMinDuration: minDuration15Min, maxResults: 25, message: `No animated 15+ min video. Searching for non-animated, 15+ min videos in ${userLanguage}...` },
+                // Attempt 2.3: Animated, English Fallback, 15+ min
+                { querySuffix: `animated tutorial English`, targetMinDuration: minDuration15Min, maxResults: 25, message: `No 15+ min video in ${userLanguage}. Searching for animated, 15+ min videos in English...` },
+                // Attempt 2.4: Non-animated, English Fallback, 15+ min
+                { querySuffix: `tutorial English`, targetMinDuration: minDuration15Min, maxResults: 25, message: `No animated 15+ min video in English. Searching for non-animated, 15+ min videos in English...` },
+
+                // Phase 3: Last Resort - Target 5+ minute videos, broader search
+                // Attempt 3.1: Any type, User Language, 5+ min
+                { querySuffix: `tutorial ${userLanguage}`, targetMinDuration: minDuration5Min, maxResults: 50, message: `Could not find specific video. Searching for any popular 5+ min tutorial on "${chapterName}" in ${userLanguage}...` },
+                // Attempt 3.2: Any type, English Fallback, 5+ min
+                { querySuffix: `tutorial English`, targetMinDuration: minDuration5Min, maxResults: 50, message: `No 5+ min tutorial in ${userLanguage}. Searching for any popular 5+ min tutorial on "${chapterName}" in English...` },
+                // Attempt 3.3: Broadest possible search (no specific duration filter from API, rely on local filtering)
+                { querySuffix: ``, targetMinDuration: minDuration5Min, maxResults: 50, message: `Final attempt: Broad search for "${chapterName}" (any relevant 5+ min video)...` }
+            ];
+
+            // Iterate through each predefined search attempt until a suitable video is found.
+            for (const attempt of searchAttempts) {
+                showMessageBox(attempt.message); // Update user on current search strategy
+                // Combine the base chapter name with the attempt's specific query suffix.
+                // The `trim()` ensures no extra spaces if `querySuffix` is empty.
+                const fullQuery = `${chapterName} ${attempt.querySuffix}`.trim(); 
+                // Fetch videos with details. `videoDuration` API parameter is explicitly omitted here
+                // as we fetch all results and filter by `targetMinDuration` locally for more control.
+                let videos = await fetchVideosWithDetails(fullQuery, attempt.maxResults);
+
+                // Filter the fetched videos based on the current attempt's minimum duration requirement.
+                videos = videos.filter(v => v.durationSeconds >= attempt.targetMinDuration);
+
+                // Sort the filtered videos:
+                // 1. By relevance score (descending: most relevant first).
+                // 2. Then by duration (descending: longest duration first, among equally relevant videos).
+                videos.sort((a, b) => {
+                    if (b.relevanceScore !== a.relevanceScore) {
+                        return b.relevanceScore - a.relevanceScore; 
+                    }
+                    return b.durationSeconds - a.durationSeconds; 
+                });
+
+                // If any videos remain after filtering and sorting, select the best one and stop searching.
+                if (videos.length > 0) {
+                    bestVideo = videos[0];
+                    console.log(`Found best video for attempt "${attempt.message}":`, bestVideo);
+                    break; // Exit the loop as a suitable video has been found.
+                }
+            }
+            
+            // After all attempts, if a best video was found, initialize the player and checkpoints.
+            if (bestVideo && bestVideo.id) {
+                createYoutubePlayer(bestVideo.id); // Initialize YouTube player with the found video
+                currentVideoDuration = bestVideo.durationSeconds; // Store video duration
+                currentVideoTitle = bestVideo.snippet.title; // Store video title
+                currentVideoDescription = bestVideo.snippet.description; // Store video description
+                chapterDisplay.textContent = currentVideoTitle; // Update chapter display with video title
+                // Proceed to fetch/generate checkpoints for the selected video.
+                await getCheckpoints(bestVideo.id, currentVideoTitle, currentVideoDescription);
+            } else {
+                // If no suitable video was found after all attempts.
+                showMessageBox(`Could not find a suitable video for "${CHAPTER_NAME}" after all attempts. Please try a different chapter name or check your API key.`);
+                loadingSpinner.style.display = 'none'; // Hide loading spinner
+            }
+        }
+
+        /**
+         * Parses a YouTube ISO 8601 duration string (e.g., "PT1H2M3S") into total seconds.
+         * @param {string} isoDuration The ISO 8601 duration string provided by YouTube API.
+         * @returns {number} The total duration converted into seconds.
+         */
+        function parseYouTubeDuration(isoDuration) {
+            // Regex to extract days, hours, minutes, and seconds from ISO 8601 duration.
+            const regex = /P(?:(\d+)D)?T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
+            const matches = isoDuration.match(regex);
+            if (!matches) return 0; // Return 0 if no match found
+
+            // Parse extracted values, defaulting to 0 if not present.
+            const days = parseInt(matches[1] || 0);
+            const hours = parseInt(matches[2] || 0);
+            const minutes = parseInt(matches[3] || 0);
+            const seconds = parseInt(matches[4] || 0);
+
+            // Calculate total seconds.
+            return (days * 24 * 3600) + (hours * 3600) + (minutes * 60) + seconds;
+        }
+
+        /**
+         * Formats a given number of seconds into a human-readable "MM:SS" time string.
+         * @param {number} seconds The time duration in seconds.
+         * @returns {string} The formatted time string (e.g., "05:30", "60:00").
+         */
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            // Pad with leading zero if single digit for consistent formatting.
+            return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        /**
+         * Uses the Gemini API to analyze the video's metadata (title, description, duration)
+         * and generate a set of spaced checkpoints, each with multiple-choice questions.
+         * @param {string} videoId The YouTube video ID.
+         * @param {string} videoTitle The title of the video.
+         * @param {string} videoDescription The description of the video.
+         */
+        async function getCheckpoints(videoId, videoTitle, videoDescription) {
+            showMessageBox('Analyzing video content and generating questions...');
+            loadingSpinner.style.display = 'block';
+
+            // Construct a detailed prompt for the Gemini LLM.
+            // It requests specific formatting (JSON array of checkpoints with questions).
+            const prompt = `
+            The following is a YouTube video about "${CHAPTER_NAME}".
+            Video Title: "${videoTitle}"
+            Video Description: "${videoDescription.slice(0, 1000)}..." (trimmed description for brevity)
+            Video Duration: ${currentVideoDuration} seconds (${formatTime(currentVideoDuration)})
+
+            Your task is to:
+            1. Identify 3-4 significant topic transitions or 'checkpoints' within the video content based on the title and description. For each checkpoint, provide a timestamp in seconds. These timestamps should be reasonably spaced throughout the video duration.
+            2. For each identified checkpoint, generate:
+                a. An array of 10-12 multiple-choice questions (MCQs) that cover the content discussed *before* that checkpoint. Each question should have 4 options (A, B, C, D) and clearly indicate the correct answer.
+
+            Provide the output as a JSON array of objects. Each object represents a checkpoint and contains:
+            - "timestamp": The checkpoint time in seconds (integer).
+            - "topic": A brief description of the topic covered up to this point.
+            - "text_questions": [ // Array of question objects
+                {
+                    "question_text": "Question 1 text?",
+                    "options": ["A. Option A", "B. Option B", "C. Option C", "D. Option D"],
+                    "correct_answer": "A"
+                }
+                // ... more questions
+            ],
+            `;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = {
+                contents: chatHistory,
+                generationConfig: {
+                    responseMimeType: "application/json", // Instruct Gemini to return JSON
+                    responseSchema: { // Define the expected JSON structure for validation
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                "timestamp": { "type": "NUMBER" },
+                                "topic": { "type": "STRING" },
+                                "text_questions": {
+                                    type: "ARRAY",
+                                    items: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            "question_text": { "type": "STRING" },
+                                            "options": { "type": "ARRAY", "items": { "type": "STRING" } },
+                                            "correct_answer": { "type": "STRING" }
+                                        },
+                                        "required": ["question_text", "options", "correct_answer"]
+                                    }
+                                }
+                            },
+                            "required": ["timestamp", "topic", "text_questions"]
+                        }
+                    }
+                }
+            };
+            const apiKey = GEMINI_API_KEY;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // Check for HTTP errors in the response.
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Gemini API error: ${response.status} - ${errorData.error.message || response.statusText}`);
+                }
+
+                const result = await response.json();
+                console.log('Gemini API Raw Response:', result);
+
+                // Safely access the generated content from the Gemini response.
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                    const jsonString = result.candidates[0].content.parts[0].text;
+                    const parsedCheckpoints = JSON.parse(jsonString); // Parse the JSON string into an object
+
+                    // Filter checkpoints: ensure timestamps are valid (within video duration) and sort them.
+                    checkpoints = parsedCheckpoints.filter(cp => 
+                        cp.timestamp > 0 && cp.timestamp < currentVideoDuration * 0.95 // Ensure checkpoint is before video ends
+                    ).sort((a, b) => a.timestamp - b.timestamp); // Sort by timestamp
+
+                    if (checkpoints.length === 0) {
+                        showMessageBox('AI could not identify suitable checkpoints or generate valid questions. Please try a different chapter or video.');
+                    } else {
+                        console.log('Generated and Filtered Checkpoints with Questions:', checkpoints);
+                        hideMessageBox(); // Hide initial message
+                    }
+                } else {
+                    throw new Error('Invalid response structure from Gemini API when generating questions.');
+                }
+            } catch (error) {
+                console.error('Error fetching questions from Gemini:', error);
+                showMessageBox(`Error generating questions. This might be due to video content or API issues: ${error.message}.`);
+                checkpoints = []; // Reset checkpoints on error
+            } finally {
+                loadingSpinner.style.display = 'none'; // Always hide spinner
+            }
+        }
+
+        /**
+         * Dynamically displays the text questions for the current checkpoint.
+         * Clears previous questions and renders new ones, including hint buttons and visual aid buttons.
+         * @param {Array<Object>} textQuestionsData An array of question objects.
+         */
+        function displayTextQuestions(textQuestionsData) {
+            questionsSection.classList.remove('hidden'); // Show the questions section
+            questionsSection.classList.add('is-active'); // Add active class for styling/logic
+            externalGameContainer.classList.add('hidden'); // Ensure external game is hidden
+            youtubePlayerDiv.classList.add('hidden'); // Hide YouTube player when questions are active
+
+            textQuestionsArea.innerHTML = ''; // Clear any previously displayed questions
+
+            // Iterate through each question and create its DOM elements.
+            textQuestionsData.forEach((q, qIndex) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'text-question-item'; 
+                questionDiv.innerHTML = `<p>${qIndex + 1}. ${q.question_text}</p><div class="text-question-options"></div>`;
+                const optionsContainer = questionDiv.querySelector('.text-question-options');
+
+                // Add radio button options for each question.
+                q.options.forEach((option, oIndex) => {
+                    const optionId = `q${qIndex}-option-${oIndex}`;
+                    const label = document.createElement('label');
+                    // Removed the redundant String.fromCharCode(65 + oIndex) as the `option` text already contains the letter.
+                    label.innerHTML = `<input type="radio" name="question-${qIndex}" value="${String.fromCharCode(65 + oIndex)}" id="${optionId}"> ${option}`;
+                    optionsContainer.appendChild(label);
+                });
+
+                // Add a "Get Hint" button for each question.
+                const hintButton = document.createElement('button');
+                hintButton.className = 'hint-button';
+                hintButton.textContent = 'Get Hint ✨';
+                hintButton.dataset.questionIndex = qIndex; // Store question index for event delegation
+
+                // Add a "Generate Visual Aid" button for each question.
+                const visualAidButton = document.createElement('button');
+                visualAidButton.className = 'hint-button'; // Reusing hint-button styling for consistency
+                visualAidButton.textContent = 'Generate Visual Aid ✨';
+                visualAidButton.dataset.questionText = q.question_text; // Pass question text for prompt
+                visualAidButton.dataset.questionIndex = qIndex;
+
+                // Add a div where the hint will be displayed.
+                const hintDisplay = document.createElement('div');
+                hintDisplay.className = 'hint-display';
+
+                // Add a div for the visual aid image
+                const visualAidDisplay = document.createElement('div');
+                visualAidDisplay.className = 'visual-aid-container'; // Container for the image and its loading state
+
+                questionDiv.appendChild(hintButton);
+                questionDiv.appendChild(visualAidButton); // Append the new button
+                questionDiv.appendChild(hintDisplay);
+                questionDiv.appendChild(visualAidDisplay);
+                
+                textQuestionsArea.appendChild(questionDiv); // Add the full question div to the area
+            });
+
+            submitChallengeBtn.disabled = false; // Enable the submit button once questions are loaded
+        }
+
+        /**
+         * Retrieves a subtle hint for a given multiple-choice question from the Gemini API.
+         * The hint is designed to guide the user without revealing the direct answer.
+         * @param {string} questionText The full text of the question.
+         * @param {Array<string>} options An array of the answer options for the question.
+         * @returns {Promise<string>} A promise that resolves with the hint text.
+         */
+        async function getHint(questionText, options) {
+            showMessageBox('Generating a hint for you...');
+            loadingSpinner.style.display = 'block';
+
+            // Construct a prompt for the Gemini LLM to generate a subtle hint.
+            const prompt = `
+            The user is learning about "${CHAPTER_NAME}" through a video.
+            Here is a multiple-choice question they are currently trying to answer:
+
+            Question: "${questionText}"
+            Options: ${options.map((opt, i) => `${String.fromCharCode(65 + i)}. ${opt}`).join('\n')}
+
+            Please provide a subtle hint for this question. Do NOT reveal the direct answer.
+            The hint should guide the user towards the concept or area they should focus on in the video to find the answer.
+            Keep the hint concise, ideally one or two sentences.
+            `;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = {
+                contents: chatHistory,
+                generationConfig: {
+                    responseMimeType: "text/plain" // Expect plain text response for hint
+                }
+            };
+            const apiKey = GEMINI_API_KEY;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Gemini API error: ${response.status} - ${errorData.error.message || response.statusText}`);
+                }
+
+                const result = await response.json();
+                // Safely extract the hint text.
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                    const hintText = result.candidates[0].content.parts[0].text;
+                    return hintText;
+                } else {
+                    throw new Error('Invalid response structure from Gemini API when generating hint.');
+                }
+            } catch (error) {
+                console.error('Error fetching hint from Gemini:', error);
+                showMessageBox(`Could not generate a hint: ${error.message}.`);
+                return 'Sorry, I cannot provide a hint right now.'; // Fallback hint
+            } finally {
+                loadingSpinner.style.display = 'none'; // Always hide spinner
+            }
+        }
+
+        /**
+         * Generates a visual aid (image) for a given question using the Imagen API.
+         * The image is generated based on the question text and chapter context.
+         * @param {string} questionText The text of the question for which to generate a visual aid.
+         * @param {HTMLElement} targetElement The DOM element where the image should be displayed.
+         */
+        async function generateVisualAid(questionText, targetElement) {
+            targetElement.innerHTML = '<div class="loading-spinner" style="display:block; width: 20px; height: 20px;"></div><p class="text-center mt-2 text-sm">Generating visual aid...</p>';
+            
+            const prompt = `Generate a simple, clear, and relevant visual representation (like an illustration or diagram) for the concept related to this question in the context of "${CHAPTER_NAME}": "${questionText}". The image should be illustrative and helpful for understanding the question, not directly answering it. Make it abstract or symbolic if a direct image is not appropriate.`;
+            
+            const payload = { instances: [{ prompt: prompt }], parameters: { "sampleCount": 1 } };
+            const apiKey = ""; // Canvas will automatically provide this in runtime
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${IMAGEN_API_MODEL}:predict?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Imagen API error: ${response.status} - ${errorData.error.message || response.statusText}`);
+                }
+
+                const result = await response.json();
+                if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+                    const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                    targetElement.innerHTML = `<img src="${imageUrl}" class="question-visual-aid" alt="Visual aid for question">`;
+                } else {
+                    targetElement.innerHTML = '<p class="text-red-400">Could not generate visual aid.</p>';
+                    throw new Error('Invalid response structure from Imagen API when generating image.');
+                }
+            } catch (error) {
+                console.error('Error generating visual aid:', error);
+                targetElement.innerHTML = `<p class="text-red-400">Error: ${error.message}</p>`;
+            } finally {
+                // No global loading spinner to hide here, as it's specific to the visual aid container.
+            }
+        }
+
+
+        /**
+         * Checks the user's answers for all text questions at the current checkpoint.
+         * Provides visual feedback (green/red background) and updates score.
+         * Decides next steps: resume video, regenerate questions, or proceed to final game.
+         */
+        function checkCheckpointAnswers() {
+            const currentCheckpoint = checkpoints[currentCheckpointIndex];
+            if (!currentCheckpoint || !currentCheckpoint.text_questions) {
+                showMessageBox('No checkpoint questions to check.');
+                return;
+            }
+
+            let allTextQuestionsCorrectForThisCheckpoint = true;
+            let questionsAttemptedInThisCheckpoint = 0;
+            let questionsCorrectInThisCheckpoint = 0;
+
+            currentCheckpoint.text_questions.forEach((q, qIndex) => {
+                const selectedOption = document.querySelector(`input[name="question-${qIndex}"]:checked`);
+                const questionDiv = document.querySelector(`.text-question-item:nth-child(${qIndex + 1})`); 
+                
+                questionsAttemptedInThisCheckpoint++; // Increment for each question processed
+
+                if (!selectedOption || selectedOption.value !== q.correct_answer) {
+                    allTextQuestionsCorrectForThisCheckpoint = false;
+                    if (questionDiv) {
+                        questionDiv.style.backgroundColor = 'rgba(255, 0, 0, 0.3)'; // Red for incorrect
+                    }
+                } else {
+                    questionsCorrectInThisCheckpoint++; // Increment for each correct question
+                    if (questionDiv) {
+                        questionDiv.style.backgroundColor = 'rgba(0, 255, 0, 0.3)'; // Green for correct
+                    }
+                    updateScore(1, 'question'); // Award 1 point for each individually correct question
+                }
+            });
+
+            // Update global chapter question counts
+            correctQuestionsInCurrentChapter += questionsCorrectInThisCheckpoint;
+            totalQuestionsAttemptedInCurrentChapter += questionsAttemptedInThisCheckpoint;
+            saveGameData(); // Persist the updated counts
+
+            const chapterPercentage = getChapterCompletionPercentage();
+
+            if (allTextQuestionsCorrectForThisCheckpoint) {
+                updateScore(10, 'checkpoint_bonus'); // Award bonus points for clearing the entire checkpoint
+                showMessageBox(`Great! All questions correct! You earned an extra 10 points for this checkpoint. Overall chapter progress: ${chapterPercentage.toFixed(0)}%. Please click play to resume the video.`);
+                
+                // If this was the last checkpoint
+                if (currentCheckpointIndex === checkpoints.length - 1) {
+                    if (chapterPercentage >= CHAPTER_PASS_SCORE_PERCENTAGE) {
+                        markChapterComplete(); // Chapter ends here if score is good
+                        return; // Stop further execution
+                    }
+                }
+                // If not last checkpoint or score not met, allow video to resume
+                if (player) {
+                    player.setVolume(100); // Restore volume
+                    // Video remains paused, user needs to click play. This is good for control.
+                    youtubePlayerDiv.classList.remove('hidden'); // Show YouTube player again
+                }
+                questionsSection.classList.add('hidden');
+                questionsSection.classList.remove('is-active');
+            } else {
+                // If some answers were incorrect
+                showMessageBox(`Some answers were incorrect. Please review and try again. Overall chapter progress: ${chapterPercentage.toFixed(0)}%. The video will restart from the beginning for review.`);
+                if (player) {
+                    player.seekTo(0, true); // Seek to the beginning of the video
+                    player.setVolume(100); // Restore volume
+                    youtubePlayerDiv.classList.remove('hidden'); // Show YouTube player again
+                    // Player remains paused, user needs to click play.
+                }
+                regenerateCheckpointQuestions(); // Generate a new set of questions for this checkpoint
+            }
+        }
+
+        /**
+         * Regenerates a new set of text questions for the current checkpoint if the user failed.
+         * This ensures a fresh challenge is provided upon reattempt, using the Gemini API.
+         */
+        async function regenerateCheckpointQuestions() {
+            const currentCheckpoint = checkpoints[currentCheckpointIndex];
+            if (!currentCheckpoint) return; // Exit if no valid checkpoint is active
+
+            showMessageBox('Generating a new set of questions for this checkpoint...');
+            loadingSpinner.style.display = 'block';
+
+            // Prompt Gemini for new questions, emphasizing they should be "new and different".
+            const prompt = `
+            The user failed the previous challenge for the video content around ${formatTime(currentCheckpoint.timestamp)} (topic: "${currentCheckpoint.topic}").
+            Generate a *new and different* array of 10-12 multiple-choice questions (MCQs) that cover the content discussed *before* this timestamp. Each question should have 4 options (A, B, C, D) and clearly indicate the correct answer.
+            `;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = {
+                contents: chatHistory,
+                generationConfig: {
+                    responseMimeType: "application/json", // Expect JSON response
+                    responseSchema: { // Define expected JSON schema
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                "question_text": { "type": "STRING" },
+                                "options": { "type": "ARRAY", "items": { "type": "STRING" } },
+                                "correct_answer": { "type": "STRING" }
+                            },
+                            "required": ["question_text", "options", "correct_answer"]
+                        }
+                    }
+                }
+            };
+            const apiKey = GEMINI_API_KEY;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Gemini API error: ${response.status} - ${errorData.error.message || response.statusText}`);
+                }
+
+                const result = await response.json();
+                const newQuestionsData = JSON.parse(result.candidates[0].content.parts[0].text);
+
+                if (newQuestionsData && Array.isArray(newQuestionsData) && newQuestionsData.length > 0) {
+                    // Update the current checkpoint's questions with the newly generated ones.
+                    currentCheckpoint.text_questions = newQuestionsData; 
+                    displayTextQuestions(newQuestionsData); // Display the new questions
+                    hideMessageBox();
+                } else {
+                    throw new Error('AI could not generate new question data for the checkpoint.');
+                }
+            } catch (error) {
+                console.error('Error regenerating challenge questions:', error);
+                showMessageBox(`Could not generate new questions: ${error.message}. Please try again.`);
+            } finally {
+                loadingSpinner.style.display = 'none'; // Hide spinner
+                questionsSection.classList.remove('hidden'); // Ensure questions section is visible
+                questionsSection.classList.add('is-active');
+            }
+        }
+
+        /**
+         * Displays the final external game challenge by making its container visible
+         * and setting the iframe source to the game URL.
+         */
+        function displayFinalGameChallenge() {
+            questionsSection.classList.add('hidden'); // Hide the questions section
+            youtubePlayerDiv.classList.add('hidden'); // Hide YouTube player when game is active
+            externalGameContainer.classList.remove('hidden'); // Show the external game container
+
+            externalGameIframe.src = EXTERNAL_GAME_URL; // Set the source of the iframe to the game URL
+            markGameCompleteBtn.disabled = false; // Enable the "Mark Game as Complete" button
+        }
+
+        /**
+         * Handles the completion of the final external game challenge.
+         * Awards points, updates level, marks the chapter as complete, and redirects.
+         */
+        function markExternalGameAsComplete() {
+            // Check if the chapter was *already* completed by score, if so, don't re-award points or level.
+            const isChapterCompleted = localStorage.getItem(`chapterCompleted_${CHAPTER_NAME}_${currentUserId}`);
+            if (isChapterCompleted === 'true') {
+                showMessageBox(`Chapter "${CHAPTER_NAME}" was already completed by score. Redirecting to the next chapter...`);
+                const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                setTimeout(() => {
+                    window.location.href = currentPath + NEXT_CHAPTER_URL;
+                }, 2000); 
+                return;
+            }
+
+            // If not already completed, proceed with game completion logic
+            updateScore(20, 'game'); // Award 20 points for game completion
+            updateLevel(1); // Increment user level
+
+            localStorage.setItem(`chapterCompleted_${CHAPTER_NAME}_${currentUserId}`, 'true');
+
+            showMessageBox(`Great job! You completed the Final Game Challenge and the chapter! Redirecting to the next chapter...`);
+            // Redirect to the next chapter after a short delay to allow message display.
+            const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+            setTimeout(() => {
+                window.location.href = currentPath + NEXT_CHAPTER_URL;
+            }, 2000); 
+            
+            externalGameContainer.classList.add('hidden'); // Hide the game container
+        }
+
+
+        // --- Event Listeners ---
+        // Attaching event listeners for user interactions.
+
+        // Theme toggle switch: changes 'light-mode' class on the body and updates Local Storage.
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // Event listener for the "OK" button in the custom message box.
+        messageOkBtn.addEventListener('click', hideMessageBox);
+
+        // Event listener for the "Submit Challenge" button to check checkpoint answers.
+        submitChallengeBtn.addEventListener('click', checkCheckpointAnswers);
+
+        // Event listener for the "Mark Game as Complete" button.
+        markGameCompleteBtn.addEventListener('click', markExternalGameAsComplete);
+
+        // Event delegation for "Get Hint" and "Generate Visual Aid" buttons.
+        // The listener is attached to the parent `questionsSection` for an efficiet.
+        questionsSection.addEventListener('click', async (event) => {
+            // Handle "Get Hint" button clicks
+            if (event.target.classList.contains('hint-button') && event.target.textContent.includes('Hint')) {
+                const button = event.target;
+                const qIndex = parseInt(button.dataset.questionIndex); 
+                const currentCheckpoint = checkpoints[currentCheckpointIndex];
+                if (!currentCheckpoint || !currentCheckpoint.text_questions[qIndex]) {
+                    showMessageBox('Could not find question data for hint.');
+                    return;
+                }
+                const questionData = currentCheckpoint.text_questions[qIndex];
+                // Find the hint display element by checking its proximity (next sibling after button)
+                let hintDisplayElement = button.nextElementSibling;
+                // Ensure it's the actual hint display div, not another button or container
+                while(hintDisplayElement && !hintDisplayElement.classList.contains('hint-display')) {
+                    hintDisplayElement = hintDisplayElement.nextElementSibling;
+                }
+
+
+                // Check if hint is already displayed to prevent redundant generation
+                if (hintDisplayElement && hintDisplayElement.textContent.trim() !== '' && hintDisplayElement.style.display !== 'none') {
+                    showMessageBox('Hint already displayed for this question.');
+                    return;
+                }
+
+                const hint = await getHint(questionData.question_text, questionData.options);
+                if (hintDisplayElement) {
+                    hintDisplayElement.textContent = hint;
+                    hintDisplayElement.style.display = 'block'; // Make hint visible
+                }
+            } 
+            // Handle "Generate Visual Aid" button clicks
+            else if (event.target.classList.contains('hint-button') && event.target.textContent.includes('Visual Aid')) {
+                const button = event.target;
+                const questionText = button.dataset.questionText;
+                
+                // Find the visual aid container. This involves finding its parent's children.
+                // The structure is: questionDiv > (p, options, hintButton, visualAidButton, hintDisplay, visualAidContainer)
+                // So, visualAidContainer is typically the next sibling after hintDisplay.
+                let visualAidContainer = button.nextElementSibling;
+                while(visualAidContainer && !visualAidContainer.classList.contains('visual-aid-container')) {
+                    visualAidContainer = visualAidContainer.nextElementSibling;
+                }
+                
+                if (!visualAidContainer) {
+                    console.error("Visual aid container not found!");
+                    showMessageBox("Error: Could not find element to display visual aid.");
+                    return;
+                }
+
+                // Prevent regenerating image if already displayed
+                if (visualAidContainer.querySelector('img')) {
+                    showMessageBox('Visual aid already generated for this question.');
+                    return;
+                }
+
+                await generateVisualAid(questionText, visualAidContainer);
+            }
+        });
+
+
+        // --- Initialization on Page Load ---
+        // This function runs when the entire page content has been loaded.
+        window.onload = async function() {
+            // Apply the saved theme preference (light or dark) from Local Storage.
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                body.classList.add('light-mode');
+                themeToggle.checked = true;
+            }
+
+            // Load saved game data and check if the current chapter is already completed.
+            loadGameData();
+            
+            // If the chapter is already completed, loadGameData will handle redirection.
+            // If it's not completed, proceed with video loading.
+            if (localStorage.getItem(`chapterCompleted_${CHAPTER_NAME}_${currentUserId}`) === 'true') {
+                return; // Exit if chapter is already complete, as loadGameData has initiated redirect.
+            }
+
+            // Determine the user's language based on default coordinates (as IP fetching can be unreliable).
+            const userLocation = DEFAULT_COORDS; 
+            const userLanguage = getLanguageFromCountry(userLocation.countryCode);
+            
+            // Load the YouTube Iframe API script asynchronously.
+            loadYoutubeIframeAPI(); 
+            
+            // --- Primary Video Loading Logic ---
+            let videoToLoad = null;
+            if (USER_PROVIDED_VIDEO_LINK) {
+                showMessageBox('Attempting to load user-provided video link...');
+                loadingSpinner.style.display = 'block';
+                const userVideoId = getYouTubeVideoId(USER_PROVIDED_VIDEO_LINK);
+                if (userVideoId) {
+                    const videoDetails = await fetchVideoDetailsById(userVideoId);
+                    if (videoDetails) {
+                        videoToLoad = videoDetails;
+                        console.log("Successfully loaded user-provided video:", videoToLoad);
+                    } else {
+                        showMessageBox('User-provided video not found or could not be loaded. Falling back to search.');
+                        console.warn("User-provided video failed to load, falling back to search.");
+                    }
+                } else {
+                    showMessageBox('Invalid user-provided YouTube URL. Falling back to search.');
+                    console.warn("Invalid user-provided YouTube URL, falling back to search.");
+                }
+            }
+
+            if (videoToLoad) {
+                // If user-provided video was successfully identified and detailed.
+                createYoutubePlayer(videoToLoad.id);
+                currentVideoDuration = videoToLoad.durationSeconds;
+                currentVideoTitle = videoToLoad.snippet.title;
+                currentVideoDescription = videoToLoad.snippet.description;
+                chapterDisplay.textContent = currentVideoTitle;
+                await getCheckpoints(videoToLoad.id, currentVideoTitle, videoToLoad.snippet.description); // Pass full description
+            } else {
+                // If no user-provided video or it failed, proceed with dynamic search.
+                searchYouTubeVideo(CHAPTER_NAME, userLanguage); 
+            }
+        };
+    </script>
+</body>
+</html>
