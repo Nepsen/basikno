@@ -12,61 +12,67 @@
         /* Define your color palette using CSS variables for easy theme management and consistency */
         :root {
             /* Dark Mode Variables: Deep, vibrant colors for an immersive feel */
-            --dark-space: #1a0a2e; /* Deepest background color, resembling outer space */
-            --deep-purple: #4a0072; /* Main container/card background, a rich dark purple */
-            --electric-blue: #007bff; /* Vibrant accent color for highlights, buttons, and interactive elements */
-            --cosmic-purple: #8a2be2; /* Lighter purple for subtle accents and borders */
-            --light-purple: #e0b0ff; /* Lightest purple, ideal for text on dark backgrounds to ensure readability */
+            --dark-space: #0f0a1c; /* Even deeper background, almost black with a purple tint */
+            --deep-purple: #2c0b4f; /* Main container/card background, richer dark purple */
+            --electric-blue: #0084ff; /* Slightly brighter electric blue for main accents */
+            --cosmic-purple: #7a1ee6; /* Vivid purple for subtle accents and borders */
+            --light-purple: #e9d3ff; /* Lighter purple, ideal for text on dark backgrounds to ensure readability */
             --accent-blue: #00b0ff; /* Another bright blue for strong emphasis and interactive elements */
             --text-dark-mode: var(--light-purple); /* Default text color in dark mode */
-            --shadow-dark-mode: rgba(0, 0, 0, 0.5); /* Shadow color for depth in dark mode */
+            --shadow-dark-mode-1: rgba(0, 0, 0, 0.6); /* Deeper primary shadow */
+            --shadow-dark-2: rgba(74, 0, 114, 0.4); /* Secondary shadow with a purple tint */
 
             /* Light Mode Variables: Clean, softer colors for a brighter interface */
-            --light-bg: white; /* Clean white background */
-            --light-text: #333344; /* Dark grey for text on light backgrounds, ensuring contrast */
-            --light-accent: #5e35b1; /* Muted purple accent for light mode elements */
-            --light-border: #d1c4e9; /* Light purple for borders/separators in light mode */
-            --light-card: #ffffff; /* White for card backgrounds in light mode */
-            --shadow-light-mode: rgba(0, 0, 0, 0.1); /* Shadow color for depth in light mode */
+            --light-bg: #f0f2f5; /* Soft grey background for light mode */
+            --light-text: #2c3e50; /* Darker text for better contrast on light backgrounds */
+            --light-accent: #673ab7; /* Muted purple accent for light mode elements */
+            --light-border: #d7ccc8; /* Light grey-purple for borders/separators in light mode */
+            --light-card: #ffffff; /* Pure white for card backgrounds in light mode */
+            --shadow-light-mode-1: rgba(0, 0, 0, 0.15); /* Primary shadow for light mode */
+            --shadow-light-mode-2: rgba(94, 53, 177, 0.1); /* Secondary shadow with a subtle purple tint */
         }
 
         /* Base body styling: sets font, background, and default text color based on theme */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--dark-space); /* Default to dark mode background */
+            background: linear-gradient(135deg, var(--dark-space) 0%, #3a0e69 100%); /* Elegant gradient background */
             color: var(--text-dark-mode); /* Default to dark mode text color */
-            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for theme changes */
+            transition: background 0.5s ease, color 0.3s ease; /* Smooth transition for theme changes */
             display: flex;
             flex-direction: column;
             align-items: center; /* Centers content horizontally */
             min-height: 100vh; /* Ensures body takes at least full viewport height */
             padding: 20px;
             box-sizing: border-box; /* Includes padding in element's total width and height */
-            line-height: 1.6; /* Optimal line height for readability */
-            font-size: 1rem; /* Base font size for global consistency */
+            line-height: 1.7; /* Optimized line height for enhanced readability */
+            font-size: 1.05rem; /* Slightly larger base font size for premium feel */
         }
 
         /* Light mode specific styles: overrides dark mode defaults when 'light-mode' class is applied */
         body.light-mode {
-            background-color: var(--light-bg);
+            background: linear-gradient(135deg, var(--light-bg) 0%, #ffffff 100%); /* Soft gradient for light mode */
             color: var(--light-text);
         }
 
         /* Container styling: central content area with rounded corners and shadow */
         .container {
             background-color: var(--deep-purple); /* Container background in dark mode */
-            border-radius: 20px; /* Soft rounded corners */
-            padding: 25px;
-            box-shadow: 0 10px 30px var(--shadow-dark-mode); /* Adds depth with shadow */
+            border-radius: 25px; /* Softer, more pronounced rounded corners */
+            padding: 30px;
+            box-shadow: 0 15px 40px var(--shadow-dark-mode-1), 0 5px 20px var(--shadow-dark-2); /* Multi-layered shadow for depth */
             width: 100%; /* Ensures responsiveness across screen sizes */
-            max-width: 900px; /* Limits maximum width for better readability on large screens */
-            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for theme changes */
+            max-width: 960px; /* Increased max-width for a more expansive feel */
+            transition: background-color 0.4s ease, box-shadow 0.4s ease; /* Smooth transition for theme changes */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle light border for definition */
+            backdrop-filter: blur(5px); /* Adds a subtle frosted glass effect */
+            -webkit-backdrop-filter: blur(5px); /* Safari support */
         }
 
         /* Light mode container styles */
         body.light-mode .container {
             background-color: var(--light-card); /* Light mode container background */
-            box-shadow: 0 10px 30px var(--shadow-light-mode); /* Light mode shadow */
+            box-shadow: 0 15px 40px var(--shadow-light-mode-1), 0 5px 20px var(--shadow-light-mode-2); /* Light mode multi-layered shadow */
+            border: 1px solid rgba(0, 0, 0, 0.05); /* Subtle dark border for light mode */
         }
 
         /* Top controls wrapper for theme toggle and Google Translate, aligned to the right */
@@ -75,10 +81,10 @@
             align-items: center;
             justify-content: flex-end; /* Aligns items to the right */
             width: 100%;
-            max-width: 900px;
-            margin-bottom: 20px;
-            padding: 0 10px;
-            gap: 15px; /* Space between elements */
+            max-width: 960px; /* Match container max-width */
+            margin-bottom: 25px;
+            padding: 0 15px; /* Adjusted padding */
+            gap: 20px; /* Increased space between elements */
             flex-wrap: wrap; /* Allows items to wrap onto the next line on smaller screens */
         }
         
@@ -86,6 +92,8 @@
             display: flex;
             align-items: center;
             color: var(--text-dark-mode);
+            font-size: 0.95rem; /* Slightly larger text for switch label */
+            font-weight: 500;
         }
 
         /* Light mode theme switch wrapper text color */
@@ -96,9 +104,9 @@
         /* Hidden checkbox styling for the theme switch */
         .theme-switch {
             display: inline-block;
-            height: 34px;
+            height: 38px; /* Slightly larger switch */
             position: relative;
-            width: 60px;
+            width: 68px; /* Slightly wider switch */
         }
 
         .theme-switch input {
@@ -107,7 +115,7 @@
 
         /* Slider track for the theme toggle */
         .slider {
-            background-color: #ccc; /* Neutral background for the toggle track */
+            background-color: #888; /* Darker neutral background for the toggle track */
             bottom: 0;
             cursor: pointer;
             left: 0;
@@ -115,7 +123,8 @@
             right: 0;
             top: 0;
             transition: .4s; /* Smooth transition for slider movement */
-            border-radius: 34px; /* Makes the track rounded */
+            border-radius: 38px; /* Makes the track rounded */
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3); /* Inner shadow for depth */
         }
 
         /* Slider handle for the theme toggle */
@@ -123,41 +132,46 @@
             background-color: #fff; /* White handle */
             bottom: 4px;
             content: ""; /* Required for :before pseudo-element */
-            height: 26px;
+            height: 30px; /* Larger handle */
             left: 4px;
             position: absolute;
             transition: .4s; /* Smooth transition for handle movement */
-            width: 26px;
+            width: 30px; /* Larger handle */
             border-radius: 50%; /* Makes the handle circular */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); /* Handle shadow */
         }
 
         /* Styles when the theme switch is checked (activates light mode) */
         input:checked + .slider {
             background-color: var(--electric-blue); /* Blue track when checked */
+            box-shadow: inset 0 2px 5px rgba(0, 132, 255, 0.5); /* Inner shadow for checked state */
         }
 
         input:checked + .slider:before {
-            transform: translateX(26px); /* Moves the handle to the right when checked */
+            transform: translateX(30px); /* Moves the handle to the right when checked */
+            box-shadow: 0 2px 8px var(--shadow-dark-2); /* Handle shadow for checked state */
         }
 
         /* Google Translate Widget Styling: overrides default Google styles for theme integration */
         #google_translate_element {
-            margin-left: 10px;
+            margin-left: 15px; /* Increased margin */
         }
         #google_translate_element .goog-te-gadget {
             font-family: 'Inter', sans-serif !important; /* Forces Inter font */
-            font-size: 0.85rem !important; /* Smaller font size */
+            font-size: 0.9rem !important; /* Slightly larger font size */
             color: var(--text-dark-mode) !important; /* Inherits theme text color */
             background-color: transparent !important; /* Transparent background */
             border: 1px solid var(--cosmic-purple) !important; /* Border color for the widget */
-            border-radius: 8px; /* Rounded corners */
+            border-radius: 10px; /* More rounded corners */
             overflow: hidden; /* Ensures content stays within bounds */
-            padding: 4px;
+            padding: 6px 10px; /* Increased padding */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
         }
         /* Light mode specific styling for Google Translate widget */
         body.light-mode #google_translate_element .goog-te-gadget {
             color: var(--light-text) !important;
             border: 1px solid var(--light-accent) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
         }
         /* Styling for the Google Translate dropdown combo box */
         #google_translate_element .goog-te-gadget .goog-te-combo {
@@ -165,6 +179,10 @@
             color: inherit !important;
             border: none !important;
             outline: none !important;
+            appearance: none; /* Hide default dropdown arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            padding-right: 20px; /* Space for custom arrow if added */
         }
         /* Hides the Google Translate banner frame to prevent UI shifts */
         .goog-te-banner-frame.skiptranslate {
@@ -177,86 +195,123 @@
 
         /* Next Chapter Link Styling */
         #next-chapter-link {
-            background-color: var(--cosmic-purple);
+            background: linear-gradient(90deg, var(--cosmic-purple) 0%, var(--electric-blue) 100%); /* Gradient button */
             color: white;
-            padding: 8px 15px;
-            border-radius: 8px;
+            padding: 10px 20px;
+            border-radius: 10px; /* More rounded */
             text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 2px 8px rgba(138, 43, 226, 0.4);
+            font-weight: 700; /* Bolder text */
+            transition: all 0.3s ease; /* Smooth transition for all properties */
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4); /* Deeper shadow */
             display: none; /* Hidden by default, shown when chapter is complete */
+            letter-spacing: 0.05em; /* Slight letter spacing for premium look */
+            text-transform: uppercase; /* Uppercase text */
         }
 
         /* Light mode next chapter link styles */
         body.light-mode #next-chapter-link {
-            background-color: var(--light-accent);
-            box-shadow: 0 2px 8px rgba(94, 53, 177, 0.2);
+            background: linear-gradient(90deg, var(--light-accent) 0%, #6200EE 100%); /* Light mode gradient */
+            box-shadow: 0 5px 15px rgba(94, 53, 177, 0.3);
         }
 
         /* Hover effect for next chapter link */
         #next-chapter-link:hover {
-            background-color: var(--electric-blue);
-            transform: translateY(-2px); /* Slight lift effect */
+            transform: translateY(-3px) scale(1.02); /* More pronounced lift and slight scale */
+            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.6); /* Even deeper shadow on hover */
+            background-position: right center; /* Animate gradient direction */
+            background-size: 200% auto; /* For gradient animation */
         }
 
         /* YouTube Player and External Game Container Styling */
-        #youtube-player, #external-game-iframe {
+        #youtube-player {
+            position: relative; /* Needed for positioning the overlay */
             width: 100%;
             aspect-ratio: 16 / 9; /* Maintains 16:9 aspect ratio for videos */
-            border-radius: 15px; /* Rounded corners for the player/iframe */
+            border-radius: 20px; /* More rounded corners */
             overflow: hidden; /* Clips content outside the rounded corners */
-            border: 2px solid var(--accent-blue); /* Distinct border for video player */
-            box-shadow: 0 0 15px rgba(0, 176, 255, 0.7); /* Blue glow effect around the player */
+            border: 3px solid var(--accent-blue); /* Thicker, more prominent border */
+            box-shadow: 0 0 25px rgba(0, 176, 255, 0.8), 0 0 50px rgba(0, 176, 255, 0.4); /* Double glow effect */
+            transition: all 0.4s ease; /* Smooth transition for player focus */
         }
+        #youtube-player:focus-within, #external-game-iframe:focus-within {
+            transform: scale(1.01); /* Slight zoom on focus */
+            box-shadow: 0 0 30px rgba(0, 176, 255, 1), 0 0 60px rgba(0, 176, 255, 0.6); /* More intense glow on focus */
+        }
+
+        /* Overlay to disable interaction with YouTube player controls */
+        #youtube-player-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0); /* Transparent, but captures clicks */
+            z-index: 10; /* Above the iframe */
+            display: none; /* Hidden by default */
+            cursor: not-allowed; /* Indicate that it's not interactive */
+        }
+        #youtube-player-overlay.active-overlay {
+            display: block; /* Show when questions are active */
+        }
+
         #external-game-container {
-            margin-top: 20px;
+            margin-top: 30px; /* More spacing */
             text-align: center;
             background-color: var(--deep-purple);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px var(--shadow-dark-mode);
+            padding: 30px; /* More padding */
+            border-radius: 20px;
+            box-shadow: 0 8px 25px var(--shadow-dark-mode-1); /* Deeper shadow */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
         }
         /* Light mode external game container styles */
         body.light-mode #external-game-container {
             background-color: var(--light-card);
-            box-shadow: 0 5px 15px var(--shadow-light-mode);
+            box-shadow: 0 8px 25px var(--shadow-light-mode-1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
         /* Styling for the "Mark Game as Complete" button */
         #mark-game-complete-btn {
-            background-color: var(--accent-blue);
+            background: linear-gradient(90deg, var(--accent-blue) 0%, #00d4ff 100%); /* Gradient button */
             color: white;
-            padding: 10px 25px;
+            padding: 12px 30px;
             border: none;
-            border-radius: 8px;
-            font-size: 1rem;
+            border-radius: 10px;
+            font-size: 1.05rem;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 176, 255, 0.4);
-            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(0, 176, 255, 0.5);
+            margin-top: 25px; /* More spacing */
+            font-weight: 600;
+            letter-spacing: 0.04em;
         }
         /* Hover effect for the game complete button */
         #mark-game-complete-btn:hover {
-            background-color: var(--electric-blue);
-            transform: translateY(-2px);
+            background-position: right center;
+            background-size: 200% auto;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 176, 255, 0.7);
         }
         /* Disabled state for the game complete button */
         #mark-game-complete-btn:disabled {
-            background-color: #666;
+            background: #666;
             cursor: not-allowed;
             box-shadow: none;
+            transform: none;
         }
 
         /* Loading spinner animation */
         .loading-spinner {
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid var(--accent-blue);
+            border: 5px solid rgba(255,255,255,0.2);
+            border-top: 5px solid var(--electric-blue);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px; /* Larger spinner */
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
+            margin: 30px auto; /* More margin */
             display: none; /* Hidden by default */
+            filter: drop-shadow(0 0 8px var(--electric-blue)); /* Glow effect */
         }
 
         /* Keyframe animation for the spinner */
@@ -268,29 +323,33 @@
         /* Questions section styling: container for checkpoint challenges */
         .questions-section { 
             background-color: var(--deep-purple);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
             width: 100%;
-            box-shadow: 0 5px 15px var(--shadow-dark-mode);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 30px var(--shadow-dark-mode-1);
+            transition: background-color 0.4s ease, box-shadow 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
         }
         /* Light mode questions section styles */
         body.light-mode .questions-section {
             background-color: var(--light-card);
-            box-shadow: 0 5px 15px var(--shadow-light-mode);
+            box-shadow: 0 10px 30px var(--shadow-light-mode-1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         /* Styles for the area containing multiple text questions */
         .text-questions-area {
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Space between individual question items */
-            margin-bottom: 25px;
-            padding: 15px;
-            background-color: rgba(74, 0, 114, 0.5); /* Semi-transparent background */
-            border-radius: 10px;
-            border: 1px solid var(--cosmic-purple);
+            gap: 20px; /* Increased space between individual question items */
+            margin-bottom: 30px; /* More spacing */
+            padding: 20px;
+            background-color: rgba(74, 0, 114, 0.3); /* Softer semi-transparent background */
+            border-radius: 15px; /* More rounded */
+            border: 1px solid var(--cosmic-purple); /* Defined border */
         }
         /* Light mode text questions area styles */
         body.light-mode .text-questions-area {
@@ -300,90 +359,123 @@
 
         /* Styling for individual question items */
         .text-question-item {
-            padding: 10px;
-            background-color: rgba(74, 0, 114, 0.7); /* Slightly darker semi-transparent background */
-            border-radius: 8px;
+            padding: 15px; /* More padding */
+            background-color: rgba(74, 0, 114, 0.5); /* Slightly darker semi-transparent background */
+            border-radius: 12px; /* More rounded */
             color: var(--text-dark-mode);
+            transition: background-color 0.3s ease; /* Smooth transition for feedback */
+            border: 1px solid rgba(255, 255, 255, 0.05); /* Very subtle internal border */
         }
         /* Light mode text question item styles */
         body.light-mode .text-question-item {
             background-color: var(--light-card);
             color: var(--light-text);
+            border: 1px solid rgba(0, 0, 0, 0.03);
         }
         .text-question-item p {
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 10px; /* More space */
+            font-size: 1.05rem;
         }
         .text-question-options label {
-            display: block; /* Each option on a new line */
-            margin-bottom: 5px;
+            display: flex; /* Use flex for better alignment of radio and text */
+            align-items: center;
+            margin-bottom: 8px; /* More space between options */
             cursor: pointer;
+            padding: 5px 0; /* Vertical padding for click area */
+            transition: color 0.2s ease;
+        }
+        .text-question-options label:hover {
+            color: var(--electric-blue); /* Highlight text on hover */
+        }
+        body.light-mode .text-question-options label:hover {
+            color: var(--light-accent);
         }
         .text-question-options input[type="radio"] {
-            margin-right: 8px;
+            margin-right: 12px; /* More space from radio button */
             accent-color: var(--accent-blue); /* Colors the radio button itself */
-            transform: scale(1.1); /* Slightly enlarges radio buttons for easier tapping */
+            transform: scale(1.2); /* Slightly larger radio buttons for easier tapping */
+            transition: transform 0.2s ease;
+        }
+        .text-question-options input[type="radio"]:checked {
+            transform: scale(1.3); /* Slightly larger when checked */
         }
 
         /* Styling for the "Submit Challenge" button */
         #submit-challenge-btn {
-            background-color: var(--accent-blue);
+            background: linear-gradient(90deg, var(--electric-blue) 0%, #00C6FF 100%); /* Gradient button */
             color: white;
-            padding: 12px 30px;
+            padding: 15px 35px; /* Larger padding */
             border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
+            border-radius: 12px; /* More rounded */
+            font-size: 1.15rem; /* Larger font */
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 176, 255, 0.4);
-            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4); /* Deeper shadow */
+            margin-top: 25px; /* More space */
+            font-weight: 700; /* Bolder text */
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
         /* Hover effect for submit button */
         #submit-challenge-btn:hover {
-            background-color: var(--electric-blue);
-            transform: translateY(-2px);
+            background-position: right center;
+            background-size: 200% auto;
+            transform: translateY(-4px) scale(1.03); /* More pronounced lift and scale */
+            box-shadow: 0 12px 25px rgba(0, 123, 255, 0.6); /* Even deeper shadow on hover */
         }
         /* Disabled state for submit button */
         #submit-challenge-btn:disabled {
-            background-color: #666;
+            background: #666;
             cursor: not-allowed;
             box-shadow: none;
+            transform: none;
         }
 
         /* Modern Message Box Styles: used for custom alerts instead of browser's alert() */
         .message-box {
-            display: none; /* Hidden by default */
             position: fixed; /* Fixed position relative to the viewport */
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+            background-color: rgba(0, 0, 0, 0.8); /* Darker overlay */
             display: flex; /* Centers content using flexbox */
             align-items: center;
             justify-content: center;
             z-index: 1000; /* Ensures it's on top of all other content */
-            backdrop-filter: blur(5px); /* Adds a subtle blur effect to background */
+            backdrop-filter: blur(8px); /* More pronounced blur effect */
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0; /* Start hidden for animation */
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .message-box.active {
+            opacity: 1;
+            visibility: visible;
         }
 
         /* Content area of the message box */
         .message-box-content {
             background-color: var(--deep-purple);
             color: var(--text-dark-mode);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px var(--shadow-dark-mode);
-            max-width: 400px;
+            padding: 40px; /* More padding */
+            border-radius: 20px; /* More rounded */
+            box-shadow: 0 20px 50px var(--shadow-dark-mode-1), 0 5px 20px var(--shadow-dark-2); /* Deeper, multi-layered shadow */
+            max-width: 450px; /* Slightly wider */
             text-align: center;
-            transform: scale(0.9); /* Starts slightly smaller */
-            animation: popIn 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Pop-in animation */
+            transform: scale(0.8); /* Starts smaller for pop-in */
+            animation: popIn 0.4s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smoother pop-in animation */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Defined border */
+            opacity: 0; /* Start hidden for animation */
         }
 
         /* Light mode message box content styles */
         body.light-mode .message-box-content {
             background-color: var(--light-card);
             color: var(--light-text);
-            box-shadow: 0 10px 30px var(--shadow-light-mode);
+            box-shadow: 0 20px 50px var(--shadow-light-mode-1), 0 5px 20px var(--shadow-light-mode-2);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         /* Keyframe animation for the pop-in effect */
@@ -393,83 +485,191 @@
         }
 
         .message-box-content p {
-            margin-bottom: 20px;
-            font-size: 1.1rem;
+            margin-bottom: 25px; /* More space */
+            font-size: 1.2rem; /* Larger font for message */
             font-weight: 500;
         }
 
         /* OK button inside the message box */
         .message-box-content button {
-            background-color: var(--accent-blue);
+            background: linear-gradient(90deg, var(--accent-blue) 0%, #00e0ff 100%); /* Gradient button */
             color: white;
-            padding: 10px 25px;
+            padding: 12px 30px;
             border: none;
-            border-radius: 8px;
-            font-size: 1rem;
+            border-radius: 10px;
+            font-size: 1.05rem;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 176, 255, 0.4);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 176, 255, 0.5);
+            font-weight: 600;
+            letter-spacing: 0.04em;
         }
 
         /* Hover effect for message box button */
         .message-box-content button:hover {
-            background-color: var(--electric-blue);
-            transform: translateY(-2px);
+            background-position: right center;
+            background-size: 200% auto;
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 8px 20px rgba(0, 176, 255, 0.7);
         }
 
         /* Styling for the "Get Hint" button */
         .hint-button {
-            background-color: var(--electric-blue);
+            background: linear-gradient(90deg, #6c5ce7 0%, #a29bfe 100%); /* Purple-blue gradient */
             color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem; /* Smaller font for hint button */
+            padding: 8px 16px; /* Slightly larger padding */
+            border-radius: 8px; /* More rounded */
+            font-size: 0.85rem; /* Slightly larger font */
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
-            margin-top: 10px; /* Space from options */
-            display: inline-block; /* Allows it to sit nicely with text */
-            margin-right: 10px; /* Space between hint and visual aid buttons */
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(108, 92, 231, 0.4);
+            margin-top: 12px; /* More space from options */
+            display: inline-block; 
+            margin-right: 15px; /* More space between buttons */
+            font-weight: 600;
+            letter-spacing: 0.03em;
         }
         /* Hover effect for hint button */
         .hint-button:hover {
-            background-color: var(--accent-blue);
-            transform: translateY(-1px);
+            background-position: right center;
+            background-size: 200% auto;
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 5px 12px rgba(108, 92, 231, 0.6);
         }
 
         /* Styling for the hint display area */
         .hint-display {
-            background-color: rgba(0, 176, 255, 0.1); /* Light blue background for hint */
-            border-left: 4px solid var(--accent-blue); /* Left border for visual emphasis */
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 6px;
-            color: var(--text-dark-mode); /* Ensures text is readable */
-            font-size: 0.9rem;
+            background-color: rgba(0, 176, 255, 0.15); /* Slightly more opaque background for hint */
+            border-left: 5px solid var(--accent-blue); /* Thicker left border */
+            padding: 12px; /* More padding */
+            margin-top: 15px; /* More margin */
+            border-radius: 8px; /* More rounded */
+            color: var(--text-dark-mode); 
+            font-size: 0.95rem; /* Slightly larger font */
             font-style: italic;
             display: none; /* Hidden by default, shown when hint is generated */
+            line-height: 1.5;
+            animation: fadeIn 0.5s ease-out; /* Fade in animation */
         }
         /* Light mode hint display styles */
         body.light-mode .hint-display {
             background-color: rgba(94, 53, 177, 0.1);
             border-left-color: var(--light-accent);
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* Styles for generated visual aids (images) */
         .question-visual-aid {
-            max-width: 100%; /* Ensures image is responsive within its container */
-            height: auto; /* Maintains aspect ratio */
-            border-radius: 12px; /* Rounded corners matching theme */
-            margin-top: 15px; /* Space from buttons/question text */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Subtle shadow for depth */
-            border: 1px solid var(--cosmic-purple); /* Border for visual separation */
-            display: block; /* Ensures it takes up full width for centering */
-            margin-left: auto; /* Centers the image */
-            margin-right: auto; /* Centers the image */
+            max-width: 100%; 
+            height: auto; 
+            border-radius: 15px; 
+            margin-top: 20px; 
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); 
+            border: 2px solid var(--cosmic-purple); 
+            display: block; 
+            margin-left: auto; 
+            margin-right: auto; 
+            transition: all 0.3s ease;
         }
         body.light-mode .question-visual-aid {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--light-accent);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            border: 2px solid var(--light-accent);
+        }
+        .question-visual-aid:hover {
+            transform: scale(1.01);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Animations for Victory and Game Over */
+        .victory-animation, .gameover-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            flex-direction: column;
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255,255,255,0.7);
+        }
+
+        .victory-animation.active, .gameover-animation.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .victory-animation span, .gameover-animation span {
+            display: block;
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Victory Specifics */
+        .victory-animation {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); /* Green gradient */
+        }
+        .victory-animation h2 {
+            animation: bounceIn 1s ease-out forwards;
+            color: white;
+        }
+        .victory-animation .checkmark {
+            font-size: 5rem;
+            animation: fadeInScale 1s ease-out forwards;
+            animation-delay: 0.3s;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        /* Game Over Specifics */
+        .gameover-animation {
+            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%); /* Red gradient */
+        }
+        .gameover-animation h2 {
+            animation: shake 0.5s ease-in-out forwards;
+            color: white;
+        }
+        .gameover-animation .crossmark {
+            font-size: 5rem;
+            animation: fadeInRotate 1s ease-out forwards;
+            animation-delay: 0.3s;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        /* Keyframe animations for victory/gameover */
+        @keyframes bounceIn {
+            0% { transform: scale(0.1); opacity: 0; }
+            60% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+        @keyframes fadeInRotate {
+            0% { opacity: 0; transform: scale(0.5) rotate(-90deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
         }
     </style>
 </head>
@@ -489,15 +689,17 @@
 
     <div class="container">
         <h1 class="text-3xl font-bold text-center mb-6">Chapter Explorer</h1>
-        <div id="youtube-player"></div>
-        <div class="loading-spinner" id="loading-spinner"></div>
-
+        <div id="youtube-player">
+            <!-- YouTube Iframe will be injected here by the API -->
+            <div id="youtube-player-overlay"></div> <!-- Overlay to block clicks -->
+        </div>
         <div id="video-info" class="mt-4 text-center text-sm">
             <p><strong>Current Chapter:</strong> <span id="chapter-display"></span></p>
             <p><strong>Current Score:</strong> <span id="score-display">0</span></p>
             <p><strong>Level Progress:</strong> <span id="level-display">0</span></p>
             <p><strong>User ID:</strong> <span id="user-id-display">Loading...</span></p>
         </div>
+        <div class="loading-spinner" id="loading-spinner"></div>
 
         <div id="questions-section" class="questions-section mt-6 hidden">
             <h2 class="text-2xl font-bold mb-4 text-center">Checkpoint Challenge</h2>
@@ -509,6 +711,7 @@
         </div>
 
         <!-- Final Game Challenge Section: displays an external game in an iframe -->
+        <!-- This section is only shown if the user explicitly needs to play the game (e.g., didn't meet 80% score) -->
         <div id="external-game-container" class="hidden">
             <h2 class="text-2xl font-bold mb-4 text-center">Final Game Challenge!</h2>
             <p>Interact with the game below to complete this chapter.</p>
@@ -523,6 +726,20 @@
             <p id="message-text"></p>
             <button id="message-ok-btn">OK</button>
         </div>
+    </div>
+
+    <!-- Victory Animation Overlay -->
+    <div id="victory-animation" class="victory-animation">
+        <div class="checkmark">✅</div>
+        <h2>VICTORY!</h2>
+        <span>Chapter Completed Successfully!</span>
+    </div>
+
+    <!-- Game Over Animation Overlay -->
+    <div id="gameover-animation" class="gameover-animation">
+        <div class="crossmark">❌</div>
+        <h2>GAME OVER</h2>
+        <span>Keep Trying!</span>
     </div>
 
     <script type="module">
@@ -573,7 +790,7 @@
 
         // Define the current chapter's name. This is crucial as a keyword for YouTube video searches.
         // It helps find relevant content even if video titles don't exactly match.
-        const CHAPTER_NAME = 'Counting_Numbers'; 
+        const CHAPTER_NAME = 'Counting Numbers'; 
 
         // --- DOM Element References ---
         // Caching DOM elements improves performance by reducing repeated lookups.
@@ -581,12 +798,14 @@
         const themeToggle = document.getElementById('theme-toggle');
         const nextChapterLink = document.getElementById('next-chapter-link');
         const youtubePlayerDiv = document.getElementById('youtube-player');
+        const youtubePlayerOverlay = document.getElementById('youtube-player-overlay'); // New overlay element
         const loadingSpinner = document.getElementById('loading-spinner');
         const questionsSection = document.getElementById('questions-section'); 
         const chapterDisplay = document.getElementById('chapter-display');
         const scoreDisplay = document.getElementById('score-display');
         const levelDisplay = document.getElementById('level-display');
         const userIdDisplay = document.getElementById('user-id-display');
+        const videoInfo = document.getElementById('video-info'); // Reference to video info section
 
         // Custom Message Box Elements for user feedback (replacing browser's alert/confirm)
         const messageBox = document.getElementById('message-box');
@@ -601,6 +820,10 @@
         const externalGameContainer = document.getElementById('external-game-container');
         const externalGameIframe = document.getElementById('external-game-iframe');
         const markGameCompleteBtn = document.getElementById('mark-game-complete-btn');
+
+        // Animation overlays
+        const victoryAnimation = document.getElementById('victory-animation');
+        const gameoverAnimation = document.getElementById('gameover-animation');
 
         // --- Global State Variables ---
         // These variables hold the current state of the application.
@@ -624,9 +847,14 @@
         userIdDisplay.textContent = currentUserId.substring(0, 8) + '...'; 
 
         // Global State Variables for current chapter progress (for 80% rule)
-        let correctQuestionsInCurrentChapter = 0;
-        let totalQuestionsAttemptedInCurrentChapter = 0;
+        // Corrected to be properties of window to ensure global accessibility
+        window.correctQuestionsInCurrentChapter = 0;
+        window.totalQuestionsAttemptedInCurrentChapter = 0;
+        // Flag to indicate if questions need to be regenerated (after a checkpoint failure)
+        window.needsQuestionRegeneration = false; 
+
         const CHAPTER_PASS_SCORE_PERCENTAGE = 80; // Required percentage to pass a chapter without the game
+        const CHECKPOINT_PASS_SCORE_PERCENTAGE = 80; // Required percentage to pass a single checkpoint
 
 
         // --- Game Data Management Functions (using Local Storage for persistence) ---
@@ -639,12 +867,9 @@
             // Check if this specific chapter is already marked as completed for the current user.
             const isChapterCompleted = localStorage.getItem(`chapterCompleted_${CHAPTER_NAME}_${currentUserId}`);
             if (isChapterCompleted === 'true') {
-                showMessageBox(`Chapter "${CHAPTER_NAME}" is already completed! Redirecting to the next chapter.`);
-                // Construct a full URL for navigation using window.location.href as the base
+                console.log(`Chapter "${CHAPTER_NAME}" is already completed! Auto-redirecting to the next chapter.`);
                 const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-                setTimeout(() => {
-                    window.location.href = currentPath + NEXT_CHAPTER_URL;
-                }, 3000); 
+                window.location.href = currentPath + NEXT_CHAPTER_URL;
                 return; // Exit function if chapter is already complete.
             }
 
@@ -683,15 +908,15 @@
 
             currentCheckpointIndex = savedChapterProgress.currentCheckpointIndex !== undefined ? savedChapterProgress.currentCheckpointIndex : -1;
             lastCheckpointTime = savedChapterProgress.lastCheckpointTime !== undefined ? savedChapterProgress.lastCheckpointTime : 0;
-            correctQuestionsInCurrentChapter = savedChapterProgress.correctQuestions || 0;
-            totalQuestionsAttemptedInCurrentChapter = savedChapterProgress.totalQuestions || 0;
+            window.correctQuestionsInCurrentChapter = savedChapterProgress.correctQuestions || 0;
+            window.totalQuestionsAttemptedInCurrentChapter = savedChapterProgress.totalQuestions || 0;
             
             console.log('Game data loaded from Local Storage:', { 
                 score: scoreDisplay.textContent, 
                 level: levelDisplay.textContent, 
                 savedChapterProgress, 
-                correctQuestionsInCurrentChapter, 
-                totalQuestionsAttemptedInCurrentChapter 
+                correctQuestionsInCurrentChapter: window.correctQuestionsInCurrentChapter, 
+                totalQuestionsAttemptedInCurrentChapter: window.totalQuestionsAttemptedInCurrentChapter 
             });
         }
 
@@ -704,8 +929,8 @@
             const progressData = {
                 currentCheckpointIndex: currentCheckpointIndex,
                 lastCheckpointTime: lastCheckpointTime,
-                correctQuestions: correctQuestionsInCurrentChapter,
-                totalQuestions: totalQuestionsAttemptedInCurrentChapter
+                correctQuestions: window.correctQuestionsInCurrentChapter,
+                totalQuestions: window.totalQuestionsAttemptedInCurrentChapter
             };
             localStorage.setItem(chapterProgressKey, JSON.stringify(progressData)); // Stringify object for storage
             console.log('Game progress saved to Local Storage:', progressData);
@@ -755,7 +980,7 @@
             currentLevel += levelsToAdd;
             localStorage.setItem('levelofbasikno', currentLevel.toString()); // Store as string
             levelDisplay.textContent = currentLevel; // Update UI
-            console.log('Level updated:', currentLevel);
+            console.log('Level upgraded to:', currentLevel); // Log to confirm level update
         }
 
         /**
@@ -763,19 +988,22 @@
          * @returns {number} The percentage (0-100).
          */
         function getChapterCompletionPercentage() {
-            if (totalQuestionsAttemptedInCurrentChapter === 0) return 0;
-            return (correctQuestionsInCurrentChapter / totalQuestionsAttemptedInCurrentChapter) * 100;
+            if (window.totalQuestionsAttemptedInCurrentChapter === 0) return 0;
+            return (window.correctQuestionsInCurrentChapter / window.totalQuestionsAttemptedInCurrentChapter) * 100;
         }
 
         /**
          * Marks the current chapter as complete, awards final points, updates level, and redirects to the next chapter.
+         * This function is now only called when the chapter is truly completed (80%+ overall score).
          */
         function markChapterComplete() {
             // Check if the chapter was already marked complete to prevent duplicate actions
             const isChapterCompleted = localStorage.getItem(`chapterCompleted_${CHAPTER_NAME}_${currentUserId}`);
             if (isChapterCompleted === 'true') {
-                console.log(`Chapter "${CHAPTER_NAME}" already marked completed. Skipping re-marking.`);
-                return;
+                console.log(`Chapter "${CHAPTER_NAME}" is already completed! Auto-redirecting to the next chapter.`);
+                const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                window.location.href = currentPath + NEXT_CHAPTER_URL;
+                return; // Exit function if chapter is already complete.
             }
 
             updateScore(50, 'chapter_completion'); // Award bonus points for chapter completion
@@ -784,19 +1012,19 @@
             // Mark the current chapter as completed in Local Storage for the current user.
             localStorage.setItem(`chapterCompleted_${CHAPTER_NAME}_${currentUserId}`, 'true');
 
-            showMessageBox(`Congratulations! You've successfully completed Chapter "${CHAPTER_NAME}"! Redirecting to the next chapter...`);
-            
-            // Construct a full URL for navigation using window.location.href as the base
-            const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-            setTimeout(() => {
-                window.location.href = currentPath + NEXT_CHAPTER_URL;
-            }, 2000); 
-            
-            // Hide all main content sections during redirect
+            // Hide all main content sections before showing victory animation to prevent overlap
             youtubePlayerDiv.classList.add('hidden');
+            videoInfo.classList.add('hidden');
             questionsSection.classList.add('hidden');
             externalGameContainer.classList.add('hidden');
             loadingSpinner.style.display = 'none';
+
+            // Show victory animation, and then redirect upon its completion
+            showVictoryAnimation('Chapter Completed Successfully!', () => {
+                console.log('Redirecting to next chapter as chapter is fully completed with A+...');
+                const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                window.location.href = currentPath + NEXT_CHAPTER_URL;
+            });
         }
 
 
@@ -825,15 +1053,44 @@
          */
         function showMessageBox(message) {
             messageText.textContent = message;
-            messageBox.style.display = 'flex'; // Make the message box visible and center its content
+            messageBox.classList.add('active'); // Add active class to show with animation
         }
 
         /**
          * Hides the custom message box.
          */
         function hideMessageBox() {
-            messageBox.style.display = 'none';
+            messageBox.classList.remove('active'); // Remove active class to hide with animation
         }
+
+        /**
+         * Shows a victory animation overlay.
+         * @param {string} message The message to display.
+         * @param {function} [callback] An optional callback function to run after animation.
+         */
+        function showVictoryAnimation(message, callback = () => {}) {
+            victoryAnimation.querySelector('span').textContent = message;
+            victoryAnimation.classList.add('active');
+            setTimeout(() => {
+                victoryAnimation.classList.remove('active');
+                callback(); // Execute callback after animation fades
+            }, 3000); // Display for 3 seconds
+        }
+
+        /**
+         * Shows a game over animation overlay.
+         * @param {string} message The message to display.
+         * @param {function} [callback] An optional callback function to run after animation.
+         */
+        function showGameOverAnimation(message, callback = () => {}) {
+            gameoverAnimation.querySelector('span').textContent = message;
+            gameoverAnimation.classList.add('active');
+            setTimeout(() => {
+                gameoverAnimation.classList.remove('active');
+                callback(); // Execute callback after animation fades
+            }, 3000); // Display for 3 seconds
+        }
+
 
         /**
          * Extracts YouTube video ID from a given URL.
@@ -961,31 +1218,26 @@
                 console.log('Video ended.');
                 const chapterPercentage = getChapterCompletionPercentage();
 
-                // Condition for chapter completion at video end:
-                // 1. All checkpoints have been encountered AND overall chapter percentage is met.
-                // OR
-                // 2. Even if not all checkpoints were encountered, if the overall score is high enough.
-                if (currentCheckpointIndex >= checkpoints.length - 1 && chapterPercentage >= CHAPTER_PASS_SCORE_PERCENTAGE) {
-                    showMessageBox(`Video completed and your overall performance (${chapterPercentage.toFixed(0)}%) is excellent! You completed the chapter.`);
-                    markChapterComplete(); // Skip game, go straight to next chapter
-                } else if (chapterPercentage >= CHAPTER_PASS_SCORE_PERCENTAGE) {
-                    // This is the case where video ended, and percentage is met, but perhaps not all checkpoints were hit.
-                    // This caters to "if hae 80% so the learn end before game"
-                    showMessageBox(`Video completed and your overall performance (${chapterPercentage.toFixed(0)}%) is excellent! You completed the chapter.`);
-                    markChapterComplete();
-                }
-                else {
-                    // If video ended but chapter not complete (score not met or checkpoints remaining)
-                    showMessageBox(`The video ended, but your overall chapter progress is ${chapterPercentage.toFixed(0)}%. Please review the video from the beginning to improve your understanding and try the remaining checkpoints. Click play to restart.`);
-                    player.seekTo(0, true); // Restart video from 0:00
-                    player.setVolume(100); // Ensure volume is on for restart
-                    // Player remains paused, user needs to click play.
+                // If video ended and user has achieved 80%+ overall score (A+)
+                if (chapterPercentage >= CHAPTER_PASS_SCORE_PERCENTAGE) {
+                    markChapterComplete(); // Chapter ends, with victory animation and next chapter redirect
+                } else {
+                    // If video ended and user has NOT achieved 80%+ overall score
+                    showGameOverAnimation(`The video ended. Overall progress: ${chapterPercentage.toFixed(0)}%. Try again!`, () => {
+                        // Clear chapter progress from local storage for a fresh start of the chapter
+                        localStorage.removeItem(`chapterProgress_${CHAPTER_NAME}_${currentUserId}`);
+                        // Perform a full page reload to reset all states for the chapter
+                        window.location.reload(); 
+                    });
                 }
             } else if (event.data === YT.PlayerState.PLAYING) {
-                // When video is playing, hide question and game sections.
+                // When video is playing, ensure question and game sections are hidden.
                 questionsSection.classList.add('hidden');
                 questionsSection.classList.remove('is-active'); // Removes an active state class
                 externalGameContainer.classList.add('hidden'); // Hide the final game challenge
+                youtubePlayerDiv.classList.remove('hidden'); // Ensure video player is visible
+                videoInfo.classList.remove('hidden'); // Ensure video info is visible
+                youtubePlayerOverlay.classList.remove('active-overlay'); // Enable player controls
                 if (player) player.setPlaybackRate(1); // Ensures normal playback speed
             }
         }
@@ -995,31 +1247,73 @@
          * Pauses the video and displays questions when a checkpoint timestamp is reached.
          */
         function monitorVideoTime() {
-            // Conditions to skip monitoring: player not ready, no checkpoints, or questions already active.
+            // Only proceed if player is ready, there are checkpoints, and questions are not currently active.
             if (!player || typeof player.getCurrentTime !== 'function' || checkpoints.length === 0 || questionsSection.classList.contains('is-active')) {
                 return;
             }
 
             const currentTime = player.getCurrentTime();
-            lastPlayedTime = currentTime; // Update the last recorded playback time.
+            lastPlayedTime = currentTime;
 
-            // Find the next checkpoint that hasn't been passed yet and whose timestamp has been reached.
-            const nextCheckpoint = checkpoints.find((cp, index) => {
-                return index > currentCheckpointIndex && currentTime >= cp.timestamp;
-            });
+            let shouldTriggerCheckpoint = false;
+            let targetCheckpoint = null;
 
-            if (nextCheckpoint) {
-                currentCheckpointIndex = checkpoints.indexOf(nextCheckpoint); // Update the index of the active checkpoint
-                lastCheckpointTime = nextCheckpoint.timestamp; // Store the exact timestamp for resuming playback
-                
-                player.pauseVideo(); // Pause video for the checkpoint challenge
-                player.setVolume(0); // Mute video during checkpoint
-                
-                displayTextQuestions(nextCheckpoint.text_questions); // Display the questions for this checkpoint
-                questionsSection.classList.remove('hidden'); // Show the questions section
-                questionsSection.classList.add('is-active'); // Mark as active for CSS styling/logic
-                showMessageBox(`Checkpoint reached at ${formatTime(nextCheckpoint.timestamp)}! Answer all questions to continue.`);
-                saveGameData(); // Save game progress after hitting a checkpoint
+            // Scenario 1: Advancing to a new, unpassed checkpoint
+            // Find the *first* checkpoint that is ahead of the current progress
+            for (let i = currentCheckpointIndex + 1; i < checkpoints.length; i++) {
+                if (currentTime >= checkpoints[i].timestamp) {
+                    shouldTriggerCheckpoint = true;
+                    targetCheckpoint = checkpoints[i];
+                    currentCheckpointIndex = i; // Update index immediately to the newly triggered checkpoint
+                    break;
+                }
+            }
+
+            // Scenario 2: Re-triggering the *current* checkpoint after a failure and video rewind
+            // This happens if the questions were hidden (due to failure) AND
+            // the video time has now reached the current checkpoint's original timestamp.
+            // Use a small buffer to ensure the trigger happens reliably right at the timestamp.
+            if (!shouldTriggerCheckpoint && currentCheckpointIndex !== -1 && window.needsQuestionRegeneration) {
+                const currentCpTimestamp = checkpoints[currentCheckpointIndex].timestamp;
+                // Check if current time is within a small window around the checkpoint timestamp
+                if (currentTime >= currentCpTimestamp - 0.5 && currentTime < currentCpTimestamp + 5) { 
+                    shouldTriggerCheckpoint = true;
+                    targetCheckpoint = checkpoints[currentCheckpointIndex];
+                    // currentCheckpointIndex is already correctly set from the failure path, no need to update here
+                }
+            }
+
+            if (shouldTriggerCheckpoint) {
+                lastCheckpointTime = targetCheckpoint.timestamp; // Store this for potential future rewinds
+
+                player.pauseVideo();
+                player.setVolume(0);
+                youtubePlayerOverlay.classList.add('active-overlay'); // Disable player controls
+
+                youtubePlayerDiv.classList.add('hidden');
+                videoInfo.classList.add('hidden');
+                questionsSection.classList.remove('hidden'); // Show questions section
+                questionsSection.classList.add('is-active'); // Mark as active
+
+                if (window.needsQuestionRegeneration) {
+                    // This is a re-attempt, regenerate new questions for the current checkpoint
+                    window.needsQuestionRegeneration = false; // Reset the flag
+                    showMessageBox(`Review complete! Generating new questions for this checkpoint...`);
+                    // Ensure regenerating questions for the correct (current) checkpoint
+                    regenerateCheckpointQuestions().then(() => {
+                        displayTextQuestions(checkpoints[currentCheckpointIndex].text_questions);
+                        hideMessageBox(); // Hide message box after new questions are displayed
+                    }).catch(error => {
+                        console.error("Error regenerating questions on reattempt:", error);
+                        showMessageBox("Failed to load new questions. Please try again.");
+                        loadingSpinner.style.display = 'none'; // Ensure spinner is hidden
+                    });
+                } else {
+                    // This is the first time reaching this checkpoint
+                    showMessageBox(`Checkpoint reached at ${formatTime(lastCheckpointTime)}! Answer all questions to continue.`);
+                    displayTextQuestions(targetCheckpoint.text_questions);
+                }
+                saveGameData(); // Save game data (including updated currentCheckpointIndex)
             }
         }
 
@@ -1122,7 +1416,6 @@
                 const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&order=viewCount&maxResults=${maxResults}&key=${apiKey}`;
 
                 try {
-                    console.log(`Attempting to fetch videos for query: "${query}" with YouTube key index: ${currentYoutubeApiKeyIndex % YOUTUBE_API_KEYS.length}`);
                     const response = await fetch(youtubeApiUrl);
                     
                     if (response.ok) {
@@ -1153,14 +1446,11 @@
                             console.warn(`No videos found for query "${query}" with YouTube key ${apiKey}.`);
                         }
                     } else if (response.status === 403 || response.status === 400) {
-                        // 403 Forbidden or 400 Bad Request often means API key issue
                         console.warn(`YouTube API key "${apiKey}" failed with status ${response.status} for search. Trying next key...`);
                     } else {
-                        // Other HTTP errors
                         console.error(`Error fetching search results with YouTube key ${apiKey}: Status ${response.status} - ${response.statusText}`);
                     }
                 } catch (error) {
-                    // Network errors
                     console.error(`Network error fetching search results with YouTube key ${apiKey}:`, error);
                 }
                 
@@ -1216,9 +1506,7 @@
                 // Attempt 3.1: Any type, User Language, 5+ min
                 { querySuffix: `tutorial ${userLanguage}`, targetMinDuration: minDuration5Min, maxResults: 50, message: `Could not find specific video. Searching for any popular 5+ min tutorial on "${chapterName}" in ${userLanguage}...` },
                 // Attempt 3.2: Any type, English Fallback, 5+ min
-                { querySuffix: `tutorial English`, targetMinDuration: minDuration5Min, maxResults: 50, message: `No 5+ min tutorial in ${userLanguage}. Searching for any popular 5+ min tutorial on "${chapterName}" in English...` },
-                // Attempt 3.3: Broadest possible search (no specific duration filter from API, rely on local filtering)
-                { querySuffix: ``, targetMinDuration: minDuration5Min, maxResults: 50, message: `Final attempt: Broad search for "${chapterName}" (any relevant 5+ min video)...` }
+                { querySuffix: `tutorial English`, targetMinDuration: minDuration5Min, maxResults: 50, message: `Final attempt: Broad search for "${chapterName}" (any relevant 5+ min video)...` }
             ];
 
             // Iterate through each predefined search attempt until a suitable video is found.
@@ -1377,7 +1665,6 @@
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
                 try {
-                    console.log(`Attempting to generate checkpoints with Gemini key index: ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}`);
                     const response = await fetch(apiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1409,6 +1696,10 @@
                         }
                     } else if (response.status === 403 || response.status === 400) {
                         console.warn(`Gemini API key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}) failed with status ${response.status} for checkpoint generation. Trying next key...`);
+                    } else if (response.status === 503) {
+                         // Specific handling for 503 Service Unavailable
+                        console.error(`Gemini API Service Unavailable (Status 503) for checkpoint generation with key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}). Trying next key...`);
+                        showMessageBox("Gemini API is temporarily unavailable. Please try again in a few moments.");
                     } else {
                         console.error(`Error fetching checkpoints with Gemini key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}): Status ${response.status} - ${response.statusText}`);
                     }
@@ -1419,7 +1710,7 @@
                 attempts++;
             }
             console.error("All Gemini API keys failed to generate checkpoints.");
-            showMessageBox(`Error generating questions after trying all API keys. Please check your network or API keys.`);
+            showMessageBox(`Failed to generate questions after multiple attempts. The Gemini API might be experiencing issues. Please try again later.`);
             checkpoints = []; // Reset checkpoints on total failure
             loadingSpinner.style.display = 'none'; // Always hide spinner
         }
@@ -1434,6 +1725,7 @@
             questionsSection.classList.add('is-active'); // Add active class for styling/logic
             externalGameContainer.classList.add('hidden'); // Ensure external game is hidden
             youtubePlayerDiv.classList.add('hidden'); // Hide YouTube player when questions are active
+            videoInfo.classList.add('hidden'); // Hide video info when questions are active
 
             textQuestionsArea.innerHTML = ''; // Clear any previously displayed questions
 
@@ -1477,14 +1769,13 @@
          * The hint is designed to guide the user without revealing the direct answer.
          * It iterates through the available API keys until a successful response is received.
          * @param {string} questionText The full text of the question.
-         * @param {Array<string>} options An array of the answer options for the question.
-         * @returns {Promise<string>} A promise that resolves with the hint text.
+         * @param {Array<string>} options The options for the question.
+         * @returns {Promise<string>} A promise resolving to the hint text.
          */
         async function getHint(questionText, options) {
-            showMessageBox('Generating a hint for you...');
+            showMessageBox('Generating hint...');
             loadingSpinner.style.display = 'block';
 
-            // Construct a prompt for the Gemini LLM to generate a subtle hint.
             const prompt = `
             The user is learning about "${CHAPTER_NAME}" through a video.
             Here is a multiple-choice question they are currently trying to answer:
@@ -1511,8 +1802,6 @@
                 const apiKey = GEMINI_API_KEYS[currentGeminiApiKeyIndex % GEMINI_API_KEYS.length]; // Cycle through keys
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
-                console.log(`Sending hint request to Gemini API with key index: ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}`);
-
                 try {
                     const response = await fetch(apiUrl, {
                         method: 'POST',
@@ -1535,6 +1824,10 @@
                         }
                     } else if (response.status === 403 || response.status === 400) {
                         console.warn(`Gemini API key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}) failed with status ${response.status} for hint generation. Trying next key...`);
+                    } else if (response.status === 503) {
+                         // Specific handling for 503 Service Unavailable
+                        console.error(`Gemini API Service Unavailable (Status 503) for hint generation with key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}). Trying next key...`);
+                        showMessageBox("Gemini API is temporarily unavailable for hints. Please try again in a few moments.");
                     } else {
                         console.error(`Error fetching hint with Gemini key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}): Status ${response.status} - ${response.statusText}`);
                     }
@@ -1545,7 +1838,7 @@
                 attempts++;
             }
             console.error("All Gemini API keys failed to generate hint.");
-            showMessageBox(`Could not generate a hint after trying all API keys. Please check your network or API keys.`);
+            showMessageBox(`Could not generate a hint after trying all API keys. The Gemini API might be experiencing issues. Please try again later.`);
             loadingSpinner.style.display = 'none';
             return 'Sorry, I cannot provide a hint right now.'; // Fallback if all keys fail
         }
@@ -1587,42 +1880,72 @@
                 }
             });
 
+            // Calculate score for this specific checkpoint
+            const checkpointScorePercentage = (questionsCorrectInThisCheckpoint / questionsAttemptedInThisCheckpoint) * 100;
+
             // Update global chapter question counts
-            correctQuestionsInCurrentChapter += questionsCorrectInThisCheckpoint;
-            totalQuestionsAttemptedInCurrentChapter += questionsAttemptedInThisCheckpoint;
+            window.correctQuestionsInCurrentChapter += questionsCorrectInThisCheckpoint;
+            window.totalQuestionsAttemptedInCurrentChapter += questionsAttemptedInThisCheckpoint;
             saveGameData(); // Persist the updated counts
 
-            const chapterPercentage = getChapterCompletionPercentage();
+            // const chapterOverallPercentage = getChapterCompletionPercentage(); // Not directly used here, but good for context
 
-            if (allTextQuestionsCorrectForThisCheckpoint) {
+            if (checkpointScorePercentage >= CHECKPOINT_PASS_SCORE_PERCENTAGE) {
+                // User passed the current checkpoint
                 updateScore(10, 'checkpoint_bonus'); // Award bonus points for clearing the entire checkpoint
-                showMessageBox(`Great! All questions correct! You earned an extra 10 points for this checkpoint. Overall chapter progress: ${chapterPercentage.toFixed(0)}%. Please click play to resume the video.`);
+                showVictoryAnimation(`Great! You passed this checkpoint (${checkpointScorePercentage.toFixed(0)}%)!`);
                 
-                // If this was the last checkpoint
-                if (currentCheckpointIndex === checkpoints.length - 1) {
-                    if (chapterPercentage >= CHAPTER_PASS_SCORE_PERCENTAGE) {
-                        markChapterComplete(); // Chapter ends here if score is good
-                        return; // Stop further execution
-                    }
-                }
-                // If not last checkpoint or score not met, allow video to resume
-                if (player) {
-                    player.setVolume(100); // Restore volume
-                    // Video remains paused, user needs to click play. This is good for control.
-                    youtubePlayerDiv.classList.remove('hidden'); // Show YouTube player again
-                }
+                // Hide questions, show video and info
                 questionsSection.classList.add('hidden');
-                questionsSection.classList.remove('is-active');
-            } else {
-                // If some answers were incorrect
-                showMessageBox(`Some answers were incorrect. Please review and try again. Overall chapter progress: ${chapterPercentage.toFixed(0)}%. The video will restart from the beginning for review.`);
+                questionsSection.classList.remove('is-active'); // Deactivate state
+                youtubePlayerDiv.classList.remove('hidden'); // Show YouTube player again
+                videoInfo.classList.remove('hidden'); // Show video info again
+                youtubePlayerOverlay.classList.remove('active-overlay'); // Enable player controls
+                
+                // Video resumes from the current checkpoint's timestamp (where questions were asked) + 1 second
+                // The next questions will appear at the *next* checkpoint naturally.
                 if (player) {
-                    player.seekTo(0, true); // Seek to the beginning of the video
-                    player.setVolume(100); // Restore volume
-                    youtubePlayerDiv.classList.remove('hidden'); // Show YouTube player again
-                    // Player remains paused, user needs to click play.
+                    player.setVolume(100); 
+                    player.seekTo(currentCheckpoint.timestamp + 1, true); // <--- CHANGE HERE
+                    player.playVideo(); 
                 }
-                regenerateCheckpointQuestions(); // Generate a new set of questions for this checkpoint
+                window.needsQuestionRegeneration = false; // Reset regeneration flag as checkpoint was passed
+
+                // Advance checkpoint index after seeking. This is important so monitorVideoTime
+                // knows to look for the *next* checkpoint.
+                currentCheckpointIndex++; 
+                saveGameData(); // Save updated checkpoint index after advancing
+            } else { // Checkpoint failed
+                // Set flag for regeneration on next re-trigger of this checkpoint
+                window.needsQuestionRegeneration = true; 
+
+                showGameOverAnimation(`Checkpoint failed (${checkpointScorePercentage.toFixed(0)}%). Review & try again!`, () => {
+                    youtubePlayerDiv.classList.remove('hidden'); 
+                    videoInfo.classList.remove('hidden');
+                    questionsSection.classList.add('hidden'); 
+                    questionsSection.classList.remove('is-active');
+                    youtubePlayerOverlay.classList.remove('active-overlay'); // Enable player controls
+
+                    let seekToTimeForReview;
+                    if (currentCheckpointIndex === 0) {
+                        // If the first checkpoint failed, restart video from 0:00
+                        seekToTimeForReview = 0; 
+                    } else {
+                        // For subsequent checkpoints, go back to the start of the PREVIOUS checkpoint's segment
+                        // The previous checkpoint's timestamp marks the beginning of the current segment
+                        seekToTimeForReview = checkpoints[currentCheckpointIndex - 1].timestamp;
+                    }
+                    
+                    if (player) {
+                        player.setVolume(100); 
+                        player.seekTo(seekToTimeForReview, true);
+                        player.playVideo(); 
+                    }
+                    // currentCheckpointIndex is NOT changed here. It remains pointing to the failed checkpoint.
+                    // This is correct, as the video will rewind and then monitorVideoTime will re-trigger
+                    // the *same* checkpoint when it reaches `checkpoints[currentCheckpointIndex].timestamp` again,
+                    // and `window.needsQuestionRegeneration` will ensure new questions are loaded.
+                });
             }
         }
 
@@ -1634,8 +1957,9 @@
             const currentCheckpoint = checkpoints[currentCheckpointIndex];
             if (!currentCheckpoint) return; // Exit if no valid checkpoint is active
 
-            showMessageBox('Generating a new set of questions for this checkpoint...');
-            loadingSpinner.style.display = 'block';
+            // This message is now handled by monitorVideoTime before calling this function
+            // showMessageBox('Generating a new set of questions for this checkpoint...');
+            loadingSpinner.style.display = 'block'; // Show spinner while regenerating
 
             // Prompt Gemini for new questions, emphasizing they should be "new and different".
             const prompt = `
@@ -1670,7 +1994,6 @@
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
                 try {
-                    console.log(`Attempting to regenerate questions with Gemini key index: ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}`);
                     const response = await fetch(apiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1683,8 +2006,8 @@
 
                         if (newQuestionsData && Array.isArray(newQuestionsData) && newQuestionsData.length > 0) {
                             currentCheckpoint.text_questions = newQuestionsData; 
-                            displayTextQuestions(newQuestionsData); 
-                            hideMessageBox();
+                            // displayTextQuestions(newQuestionsData); // This is called after the promise resolves in monitorVideoTime
+                            loadingSpinner.style.display = 'none'; // Hide spinner on success
                             currentGeminiApiKeyIndex = 0; // Reset index on success
                             return; // Exit function on success
                         } else {
@@ -1692,6 +2015,10 @@
                         }
                     } else if (response.status === 403 || response.status === 400) {
                         console.warn(`Gemini API key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}) failed with status ${response.status} for question regeneration. Trying next key...`);
+                    } else if (response.status === 503) {
+                         // Specific handling for 503 Service Unavailable
+                        console.error(`Gemini API Service Unavailable (Status 503) for question regeneration with key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}). Trying next key...`);
+                        showMessageBox("Gemini API is temporarily unavailable for question regeneration. Please try again in a few moments.");
                     } else {
                         console.error(`Error regenerating challenge questions with Gemini key (index ${currentGeminiApiKeyIndex % GEMINI_API_KEYS.length}): Status ${response.status} - ${response.statusText}`);
                     }
@@ -1702,19 +2029,23 @@
                 attempts++;
             }
             console.error("All Gemini API keys failed to regenerate questions.");
-            showMessageBox(`Could not generate new questions after trying all API keys. Please try again or check your network/API keys.`);
+            showMessageBox(`Could not generate new questions after trying all API keys. The Gemini API might be experiencing issues. Please try again later.`);
             loadingSpinner.style.display = 'none'; 
             questionsSection.classList.remove('hidden'); 
             questionsSection.classList.add('is-active');
+            throw new Error("Failed to regenerate questions after all API key attempts."); // Propagate error
         }
 
         /**
          * Displays the final external game challenge by making its container visible
          * and setting the iframe source to the game URL.
+         * This function will only be called if the chapter is NOT completed by score (i.e., less than 80%).
          */
         function displayFinalGameChallenge() {
             questionsSection.classList.add('hidden'); // Hide the questions section
             youtubePlayerDiv.classList.add('hidden'); // Hide YouTube player when game is active
+            videoInfo.classList.add('hidden'); // Hide video info when game is active
+            youtubePlayerOverlay.classList.add('active-overlay'); // Disable player controls during game
             externalGameContainer.classList.remove('hidden'); // Show the external game container
 
             externalGameIframe.src = EXTERNAL_GAME_URL; // Set the source of the iframe to the game URL
@@ -1743,14 +2074,14 @@
 
             localStorage.setItem(`chapterCompleted_${CHAPTER_NAME}_${currentUserId}`, 'true');
 
-            showMessageBox(`Great job! You completed the Final Game Challenge and the chapter! Redirecting to the next chapter...`);
-            // Redirect to the next chapter after a short delay to allow message display.
-            const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-            setTimeout(() => {
+            showVictoryAnimation(`Great job! You completed the Final Game Challenge and the chapter!`, () => {
+                // Redirect to the next chapter after a short delay to allow message display.
+                const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
                 window.location.href = currentPath + NEXT_CHAPTER_URL;
-            }, 2000); 
+            });
             
             externalGameContainer.classList.add('hidden'); // Hide the game container
+            youtubePlayerOverlay.classList.remove('active-overlay'); // Enable player controls after game
         }
 
 
