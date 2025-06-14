@@ -23,6 +23,8 @@
             --light-accent: #5e35b1;
             --light-border: #d1c4e9;
             --light-card: #ffffff;
+            --light-shadow-base: rgba(93, 53, 177, 0.15); /* Softer shadow for light mode */
+            --dark-shadow-base: rgba(74, 0, 114, 0.5); /* Deeper shadow for dark mode */
         }
 
         /* Universal box-sizing and font */
@@ -31,7 +33,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Orbitron', 'Segoe UI', system-ui; /* Original font priority for Basikno theme */
-            transition: background-color 0.5s ease, color 0.3s ease;
+            transition: background-color 0.5s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
         
         /* Import Orbitron font from Google Fonts */
@@ -50,15 +52,15 @@
             background-color: var(--light-bg);
         }
         
-        /* Loading Screen Styles */
+        /* --- Premium Loading Screen Styles --- */
         #loading-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: white; /* Initial dark background */
-            background-image: url('https://assets.onecompiler.app/438cc35sk/43mnbjzq5/Meta-AI-Expasion_Header.webp');
+            background-color: #1a0a2e; /* Dark fallback */
+            background-image: url('https://about.fb.com/wp-content/uploads/2024/04/Meta-AI-Expasion_Header.gif');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -72,46 +74,109 @@
             gap: 20px;
         }
 
-        body.light-mode #loading-screen {
-            background-color: white;
-        }
-
         #loading-screen.hidden {
             opacity: 0;
             visibility: hidden;
         }
+        
+        .loading-content {
+            text-align: center;
+        }
 
         #loading-text {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            color: var(--light-accent);
-            text-shadow: 0 0 15px rgba(93, 53, 177, 0.3);
-            animation: pulse 1.5s infinite alternate;
+            font-size: 3.5rem; /* Larger text */
+            font-weight: 700;
+            text-shadow: 0 0 10px var(--accent-blue), 0 0 20px var(--accent-blue), 0 0 30px var(--deep-purple);
+            position: relative;
+            /* Shimmer effect */
+             background: linear-gradient(90deg, var(--light-accent), var(--light-text), var(--light-accent));
+             background-size: 200% auto;
+             color: transparent;
+            -webkit-background-clip: text;
+             background-clip: text;
+             text-shadow: 0 0 10px rgba(93, 53, 177, 0.3);
+             animation: shimmer 3s linear infinite, pulse 2s infinite alternate;
         }
 
+        @keyframes shimmer {
+            to {
+                background-position: -200% center;
+            }
+        }
+        
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1.05); opacity: 0.9; }
+            from { transform: scale(1); opacity: 0.9; }
+            to { transform: scale(1.05); opacity: 1; }
         }
 
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid var(--electric-blue);
-            border-top: 5px solid var(--deep-purple);
+        .spinner { display: none; } /* Hide old spinner */
+
+        /* New Premium Spinner */
+        .premium-spinner {
+            margin: 30px auto;
+            width: 60px;
+            height: 60px;
+            position: relative;
+        }
+
+        .premium-spinner::before, .premium-spinner::after {
+            content: '';
+            position: absolute;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            inset: 0;
+            border: 4px solid transparent;
+            border-top-color: var(--electric-blue);
+            animation: spin 1.5s linear infinite;
         }
 
-        body.light-mode .spinner {
-            border: 5px solid var(--light-accent);
-            border-top: 5px solid #7e57c2;
+        .premium-spinner::after {
+            border-top-color: var(--cosmic-purple);
+            animation-delay: -0.5s;
+            animation-direction: reverse;
         }
-
+        
+        body.light-mode .premium-spinner::before { border-top-color: var(--light-accent); }
+        body.light-mode .premium-spinner::after { border-top-color: #7e57c2; }
+        
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
+
+        .progress-bar-container {
+            width: 250px;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+        
+        body.light-mode .progress-bar-container { background: rgba(0,0,0,0.1); }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--deep-purple), var(--electric-blue), var(--accent-blue));
+            border-radius: 4px;
+            animation: loadProgress 3s ease-out forwards;
+        }
+        
+        body.light-mode .progress-bar { background: linear-gradient(90deg, var(--light-accent), #7e57c2, #b39ddb); }
+
+        @keyframes loadProgress {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        .loading-subtext {
+            color: var(--light-text);
+            font-size: 1rem;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+        /* --- End Loading Screen Styles --- */
+
 
         /* 3D Background - Fixed to cover the whole viewport */
         #background {
@@ -204,6 +269,7 @@
             backdrop-filter: blur(10px); /* Glassmorphism effect */
             background-color: rgba(26, 10, 46, 0.6); /* Adjusted background color */
             border-bottom: 1px solid var(--electric-blue);
+            transform: translateZ(0); /* Promote to own layer for performance */
         }
         
         body.light-mode header {
@@ -636,12 +702,13 @@
         
         .subject-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(74, 0, 114, 0.3);
+            box-shadow: 0 15px 30px var(--dark-shadow-base); /* Use variable */
             border-color: var(--accent-blue);
+            will-change: transform, box-shadow; /* Performance hint */
         }
         
         body.light-mode .subject-card:hover {
-            box-shadow: 0 15px 30px rgba(93, 53, 177, 0.2);
+            box-shadow: 0 15px 30px var(--light-shadow-base); /* Use variable */
             border-color: var(--light-accent);
         }
         
@@ -751,12 +818,13 @@
         .game-table tr:hover td {
             background: rgba(50, 20, 80, 0.9);
             transform: translateX(5px);
-            box-shadow: -5px 0 15px rgba(74, 0, 114, 0.3);
+            box-shadow: -5px 0 15px var(--dark-shadow-base); /* Use variable */
+            will-change: transform, background-color, box-shadow; /* Performance hint */
         }
         
         body.light-mode .game-table tr:hover td {
-            background: rgba(255, 255, 255, 1);
-            box-shadow: -5px 0 15px rgba(93, 53, 177, 0.2);
+            background: rgba(245, 245, 255, 0.8);
+            box-shadow: -5px 0 15px var(--light-shadow-base); /* Use variable */
         }
 
         /* Iframe container for subject content */
@@ -1150,6 +1218,28 @@
         
         .submit-btn:hover::before {
             left: 100%;
+        }
+
+        /* Message Box for Form Submission */
+        #formMessage {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none; /* Hidden by default */
+        }
+
+        #formMessage.success {
+            background-color: rgba(0, 255, 128, 0.2);
+            color: #00ff80;
+            border: 1px solid #00ff80;
+        }
+
+        #formMessage.error {
+            background-color: rgba(255, 56, 96, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
         }
         
         /* Footer */
@@ -1717,6 +1807,10 @@
 
         /* Very small mobile screens */
         @media (max-width: 480px) {
+            #loading-text {
+                font-size: 2.5rem;
+            }
+
             .hero h1 {
                 font-size: 1.8rem;
             }
@@ -1784,11 +1878,15 @@
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
+    <!-- Premium Loading Screen -->
     <div id="loading-screen">
-        <div id="loading-text">BASIKNO</div>
-        <div class="spinner"></div>
-        <p><strong>Basikno</strong> is a online platfrom for learing</p>
+        <div class="loading-content">
+            <div id="loading-text">BASIKNO</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar"></div>
+            </div>
+            <p class="loading-subtext">Optimizing your learning experience...</p>
+        </div>
     </div>
 
     <!-- 3D Background - This iframe loads the background 3D scene from Spline. -->
@@ -1844,21 +1942,21 @@
         <div class="container">
             <h2 class="section-title">CHOOSE YOUR ADVENTURE</h2>
             <div class="subjects-grid">
-                <div class="subject-card" data-subject="math">
+                <div class="subject-card" data-subject="Mathematics">
                     <div class="subject-icon">
                         <i class="fas fa-square-root-alt"></i>
                     </div>
                     <h3>MATH DUNGEON</h3>
                     <p>Solve equations to unlock doors, defeat number monsters with correct answers, collect golden variables.</p>
                 </div>
-                <div class="subject-card" data-subject="physics">
+                <div class="subject-card" data-subject="Physics">
                     <div class="subject-icon">
                         <i class="fas fa-atom"></i>
                     </div>
                     <h3>PHYSICS GALAXY</h3>
                     <p>Apply forces to move objects, calculate trajectories to hit targets, balance equations to build structures.</p>
                 </div>
-                <div class="subject-card" data-subject="chemistry">
+                <div class="subject-card" data-subject="Chemistry">
                     <div class="subject-icon">
                         <i class="fas fa-flask"></i>
                     </div>
@@ -1876,17 +1974,17 @@
                     <th>DIFFICULTY</th>
                 </tr>
                 <tr>
-                    <td>Math Dungeon</td>
+                    <td>Mathematics</td>
                     <td>Solve equations to unlock doors, defeat number monsters with correct answers, collect golden variables.</td>
                     <td>Beginner to Advanced</td>
                 </tr>
                 <tr>
-                    <td>Physics Galaxy</td>
+                    <td>Physics</td>
                     <td>Apply forces to move objects, calculate trajectories to hit targets, balance equations to build structures.</td>
                     <td>Intermediate to Expert</td>
                 </tr>
                 <tr>
-                    <td>Chemistry Lab</td>
+                    <td>Chemistry</td>
                     <td>Combine elements to create compounds, discover reactions to solve puzzles, balance equations to neutralize hazards.</td>
                     <td>Beginner to Expert</td>
                 </tr>
@@ -1895,18 +1993,18 @@
     </section>
     
     <!-- Iframe containers for each subject -->
-    <div class="iframe-container" id="mathFrame">
-        <div class="iframe-close" data-frame="mathFrame"><i class="fas fa-times"></i></div>
+    <div class="iframe-container" id="MathematicsFrame">
+        <div class="iframe-close" data-frame="MathematicsFrame"><i class="fas fa-times"></i></div>
         <iframe src="math.html" title="Math Dungeon"></iframe>
     </div>
     
-    <div class="iframe-container" id="physicsFrame">
-        <div class="iframe-close" data-frame="physicsFrame"><i class="fas fa-times"></i></div>
+    <div class="iframe-container" id="PhysicsFrame">
+        <div class="iframe-close" data-frame="PhysicsFrame"><i class="fas fa-times"></i></div>
         <iframe src="physics.html" title="Physics Galaxy"></iframe>
     </div>
     
-    <div class="iframe-container" id="chemistryFrame">
-        <div class="iframe-close" data-frame="chemistryFrame"><i class="fas fa-times"></i></div>
+    <div class="iframe-container" id="ChemistryFrame">
+        <div class="iframe-close" data-frame="ChemistryFrame"><i class="fas fa-times"></i></div>
         <iframe src="chemistry.html" title="Chemistry Lab"></iframe>
     </div>
     
@@ -1917,18 +2015,18 @@
             
             <!-- User Level Display -->
             <div class="user-level">
-                <h3>CURRENT LEVEL</h3>
+                <h3>LEVEL</h3>
                 <div class="level-display" id="userLevel">0</div>
             </div>
             
             <!-- Score Charts -->
             <div class="score-charts">
                 <div class="chart-container">
-                    <div class="chart-title">SCORE DISTRIBUTION</div>
+                    <div class="chart-title">SCORE</div>
                     <canvas id="pieChart"></canvas>
                 </div>
                 <div class="chart-container">
-                    <div class="chart-title">SCORE PROGRESSION</div>
+                    <div class="chart-title">PROGRESSION</div>
                     <canvas id="barChart"></canvas>
                 </div>
             </div>
@@ -1948,8 +2046,8 @@
         <div class="container">
             <h2 class="section-title">CONTACT US</h2>
             <div class="contact-form">
-                <h2>Send us a message</h2>
-                <form id="contactForm">
+                <!-- FormSubmit.co endpoint setup -->
+                <form id="contactForm" action="https://formsubmit.co/arafatislamlam15@gmail.com" method="POST">
                     <div class="form-group">
                         <label for="name">Your Name</label>
                         <input type="text" id="name" name="name" required>
@@ -1963,6 +2061,8 @@
                         <textarea id="message" name="message" required></textarea>
                     </div>
                     <button type="submit" class="submit-btn">SEND MESSAGE</button>
+                    <!-- Success/Error Message Display -->
+                    <div id="formMessage" class="message"></div>
                 </form>
             </div>
         </div>
@@ -2058,14 +2158,54 @@
         let pieChartInstance = null;
         let barChartInstance = null;
 
+        // Store base HSL values for each subject to ensure color consistency across theme changes
+        // Using a Map for better key-value pair management, especially if subject names could vary in case.
+        const subjectColorMap = new Map();
+
+        // Helper function to generate a consistent HSL base (hue, saturation) for subjects
+        // and adapt lightness based on theme.
+        function getSubjectColor(subject) {
+            // Define a set of distinct, aesthetically pleasing hues for the core subjects.
+            // These are somewhat arbitrary but chosen to be visually different.
+            const predefinedHues = {
+                'Mathematics': 240, // Blue
+                'Physics': 30,      // Orange/Yellow
+                'Chemistry': 120    // Green
+            };
+
+            let hue;
+            if (predefinedHues[subject]) {
+                hue = predefinedHues[subject];
+            } else {
+                // For any unexpected subject, generate a random but within a safe range for harmony
+                hue = Math.floor(Math.random() * 360);
+            }
+
+            // Fixed saturation for consistency across subjects
+            const saturation = 70; // High saturation for vibrant colors
+
+            let lightness;
+            // Adjust lightness based on the current theme for optimal contrast
+            if (document.body.classList.contains('light-mode')) {
+                lightness = 40; // Darker for light backgrounds
+            } else {
+                lightness = 70; // Brighter for dark backgrounds
+            }
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        }
+
+
         // Loading Screen functionality
         const loadingScreen = document.getElementById('loading-screen');
 
         // Hide loading screen once all content is loaded
         window.addEventListener('load', () => {
-            loadingScreen.classList.add('hidden');
-            // Allow scrolling after the loading screen is hidden
-            document.body.style.overflow = '';
+            // A short delay ensures all animations complete before hiding
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                // Allow scrolling after the loading screen is hidden
+                document.body.style.overflow = '';
+            }, 500); // 500ms delay
         });
 
         // Theme Toggle Functionality
@@ -2089,7 +2229,7 @@
                 localStorage.setItem('theme', 'light');
             } else {
                 body.classList.remove('light-mode');
-                localStorage.setItem('theme', 'dark');
+                localStorage.setItem('theme', 'light');
             }
             // Re-render charts to update colors with new theme
             updateScoreUI();
@@ -2134,37 +2274,30 @@
             const loadingId = addLoadingIndicator();
             
             try {
-                // Call OpenRouter API
-                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                // Using Gemini API as per new instructions.
+                let chatHistory = [{ role: "user", parts: [{ text: message }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = "AIzaSyDSxBCZWuN4EkiKOAwHUNNHhsGc3U6s_hM"; // Canvas will inject the key at runtime for allowed models
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
                     method: 'POST',
-                    headers: {
-                        // WARNING: EXPOSED API KEY. FOR DEMONSTRATION ONLY.
-                        // In a production environment, this key should be handled securely on a backend server.
-                        'Authorization': 'Bearer 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',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: 'deepseek/deepseek-r1:free',
-                        messages: [{
-                            role: 'system',
-                            content: 'You are a helpful learning assistant for Basikno, a gamified learning platform. Focus on helping with math, physics, and chemistry concepts. Keep responses concise and educational. Convert emoji codes to actual emojis.'
-                        }, {
-                            role: 'user',
-                            content: message
-                        }]
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
                 
-                const data = await response.json();
+                const result = await response.json();
                 
                 // Remove loading indicator
                 removeLoadingIndicator(loadingId);
                 
-                // Check if data.choices and data.choices[0].message exist
-                if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-                    const botResponse = data.choices[0].message.content;
+                // Check if response structure is valid
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const botResponse = result.candidates[0].content.parts[0].text;
                     
-                    // Convert emoji codes to actual emojis
+                    // Convert common emoji codes to actual emojis for a friendly touch
                     const responseWithEmojis = botResponse
                         .replace(/:\)/g, '😊')
                         .replace(/:\(/g, '😞')
@@ -2176,10 +2309,11 @@
                     // Add bot response
                     addChatMessage(responseWithEmojis, 'bot');
                 } else {
+                    console.error('Unexpected API response structure:', result);
                     addChatMessage("I didn't receive a valid response. Please try again or rephrase your question.", 'bot');
                 }
             } catch (error) {
-                console.error('Error calling OpenRouter API:', error);
+                console.error('Error calling Gemini API:', error);
                 // Remove loading indicator
                 removeLoadingIndicator(loadingId);
                 addChatMessage("I'm having trouble connecting to the learning assistant. Please try again later.", 'bot');
@@ -2255,7 +2389,7 @@
                 // Show message when no scores exist
                 const noScoresMessage = document.createElement('li');
                 noScoresMessage.className = 'score-item';
-                noScoresMessage.innerHTML = '<span style="text-align: center; width: 100%; color: var(--light-purple);">No scores yet. Start playing to see your progress!</span>';
+                noScoresMessage.innerHTML = `<span style="text-align: center; width: 100%; color: ${document.body.classList.contains('light-mode') ? 'var(--light-text)' : 'var(--light-purple)'};">No scores yet. Start playing to see your progress!</span>`;
                 scoreList.appendChild(noScoresMessage);
             } else {
                 // Sort scores by date (newest first)
@@ -2310,8 +2444,8 @@
                         labels: ['No Data'],
                         datasets: [{
                             data: [1],
-                            backgroundColor: ['rgba(100, 100, 100, 0.3)'],
-                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                            backgroundColor: [document.body.classList.contains('light-mode') ? 'rgba(200, 200, 200, 0.5)' : 'rgba(100, 100, 100, 0.3)'],
+                            borderColor: document.body.classList.contains('light-mode') ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.2)',
                             borderWidth: 1
                         }]
                     },
@@ -2343,14 +2477,8 @@
             const subjects = Object.keys(subjectTotals);
             const data = subjects.map(subject => subjectTotals[subject]);
             
-            // Define colors for each subject
-            const colors = {
-                Counting_Numbers: 'rgba(0, 123, 255, 0.7)',
-                Counting_and_Numbers_for_Beginners: 'rgba(138, 43, 226, 0.7)',
-                chemistry: 'rgba(0, 176, 255, 0.7)'
-            };
-            
-            const backgroundColors = subjects.map(subject => colors[subject] || 'rgba(100, 100, 100, 0.7)');
+            // Dynamically get colors for each subject based on current theme
+            const backgroundColors = subjects.map(subject => getSubjectColor(subject));
             
             // Create the pie chart
             pieChartInstance = new Chart(ctx, {
@@ -2360,7 +2488,7 @@
                     datasets: [{
                         data: data,
                         backgroundColor: backgroundColors,
-                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderColor: document.body.classList.contains('light-mode') ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.2)',
                         borderWidth: 1
                     }]
                 },
@@ -2370,7 +2498,7 @@
                         legend: {
                             position: 'top',
                             labels: {
-                                color: body.classList.contains('light-mode') ? '#333344' : '#e0b0ff',
+                                color: body.classList.contains('light-mode') ? 'var(--light-text)' : 'var(--light-purple)',
                                 font: {
                                     family: 'Orbitron, sans-serif'
                                 }
@@ -2399,8 +2527,8 @@
                         datasets: [{
                             label: 'Score',
                             data: [0],
-                            backgroundColor: ['rgba(100, 100, 100, 0.3)'],
-                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                            backgroundColor: [document.body.classList.contains('light-mode') ? 'rgba(200, 200, 200, 0.5)' : 'rgba(100, 100, 100, 0.3)'],
+                            borderColor: document.body.classList.contains('light-mode') ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.2)',
                             borderWidth: 1
                         }]
                     },
@@ -2411,7 +2539,7 @@
                                 beginAtZero: true,
                                 max: 10,
                                 ticks: {
-                                    color: body.classList.contains('light-mode') ? '#333344' : '#e0b0ff'
+                                    color: body.classList.contains('light-mode') ? 'var(--light-text)' : 'var(--light-purple)'
                                 },
                                 grid: {
                                     color: body.classList.contains('light-mode') ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
@@ -2419,7 +2547,7 @@
                             },
                             x: {
                                 ticks: {
-                                    color: body.classList.contains('light-mode') ? '#333344' : '#e0b0ff'
+                                    color: body.classList.contains('light-mode') ? 'var(--light-text)' : 'var(--light-purple)'
                                 },
                                 grid: {
                                     color: body.classList.contains('light-mode') ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
@@ -2449,14 +2577,8 @@
             const labels = recentScores.map(item => new Date(item.date).toLocaleDateString());
             const data = recentScores.map(item => item.score);
             
-            // Define colors based on subject
-            const colors = {
-                Counting_Numbers: 'rgba(0, 123, 255, 0.7)',
-                Counting_and_Numbers_for_Beginners: 'rgba(138, 43, 226, 0.7)',
-                chemistry: 'rgba(0, 176, 255, 0.7)'
-            };
-            
-            const backgroundColors = recentScores.map(item => colors[item.subject] || 'rgba(100, 100, 100, 0.7)');
+            // Dynamically get colors for each subject based on current theme
+            const backgroundColors = recentScores.map(item => getSubjectColor(item.subject));
             
             // Create the bar chart
             barChartInstance = new Chart(ctx, {
@@ -2467,7 +2589,7 @@
                         label: 'Score',
                         data: data,
                         backgroundColor: backgroundColors,
-                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderColor: document.body.classList.contains('light-mode') ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.2)',
                         borderWidth: 1
                     }]
                 },
@@ -2477,7 +2599,7 @@
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                color: body.classList.contains('light-mode') ? '#333344' : '#e0b0ff'
+                                color: body.classList.contains('light-mode') ? 'var(--light-text)' : 'var(--light-purple)'
                             },
                             grid: {
                                 color: body.classList.contains('light-mode') ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
@@ -2485,7 +2607,7 @@
                         },
                         x: {
                             ticks: {
-                                color: body.classList.contains('light-mode') ? '#333344' : '#e0b0ff'
+                                color: body.classList.contains('light-mode') ? 'var(--light-text)' : 'var(--light-purple)'
                             },
                             grid: {
                                 color: body.classList.contains('light-mode') ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
@@ -2523,32 +2645,80 @@
             });
         });
         
-        // Contact Form Submission
-        const contactForm = document.getElementById('contactForm');
-        contactForm.addEventListener('submit', function(e) {
+        // Form submission handler
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Get form values
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const message = document.getElementById('message').value;
+            const form = e.target;
+            const formMessage = document.getElementById('formMessage');
+            const submitButton = form.querySelector('button[type="submit"]');
             
-            // Create mailto link
-            const subject = encodeURIComponent(`Contact from ${name} - Basikno`);
-            const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-            const mailtoLink = `mailto:arafatislamlam15@gmail.com?subject=${subject}&body=${body}`;
+            // Get form data
+            const formData = new FormData(form);
+            const data = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                message: formData.get('message'),
+                to: 'arafatislamlam15@gmail.com' // Your email address
+            };
             
-            // Open default email client
-            window.location.href = mailtoLink;
+            // Validate form
+            if (!data.name || !data.email || !data.message) {
+                formMessage.textContent = 'Please fill in all fields';
+                formMessage.className = 'form-message error-message';
+                return;
+            }
             
-            // Show success message (using a custom modal would be better than alert)
-            // IMPORTANT: Removed alert() as per guidelines. Consider a custom modal for user feedback.
-            // alert(`Thanks for your message, ${name}! Your email client will open to send the message.`);
+            if (!data.email.includes('@') || !data.email.includes('.')) {
+                formMessage.textContent = 'Please enter a valid email address';
+                formMessage.className = 'form-message error-message';
+                return;
+            }
             
-            // Reset form
-            contactForm.reset();
+            // Change button text
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            formMessage.textContent = '';
+            
+            // In production, replace this with actual email sending code
+            // Example using FormSubmit.co (free service)
+            fetch('https://formsubmit.co/ajax/arafatislamlam15@gmail.com', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                formMessage.textContent = 'Message sent successfully! We will respond soon.';
+                formMessage.className = 'form-message success-message';
+                form.reset();
+            })
+            .catch(error => {
+                formMessage.textContent = 'Error sending message. Please try again later.';
+                formMessage.className = 'form-message error-message';
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Send Message';
+                
+                // Reset message after 5 seconds
+                setTimeout(() => {
+                    formMessage.textContent = '';
+                }, 5000);
+            });
         });
-        
+
+        function displayFormMessage(message, type) {
+            formMessage.textContent = message;
+            formMessage.className = 'message'; // Reset classes
+            formMessage.classList.add(type); // Add success or error class
+            formMessage.style.display = 'block'; // Show the message
+        }
+
         // Hero title typewriter effect
         const heroTitles = [
             "LEVEL UP YOUR BRAIN WHILE PLAYING!",
