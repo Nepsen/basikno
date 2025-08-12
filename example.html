@@ -1,1 +1,214 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Updated Website</title>
+  <!-- Font Awesome CDN for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    /* Reset some default styles */ 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+
+    header {
+      background-color: #222;
+      color: #fff;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    header h1 {
+      margin-bottom: 0.5em;
+    }
+
+    nav {
+      background-color: #444;
+    }
+
+    nav ul {
+      display: flex;
+      flex-wrap: wrap;
+      list-style: none;
+      justify-content: center;
+    }
+
+    nav ul li {
+      margin: 0 15px;
+    }
+
+    nav ul li a {
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 20px;
+      display: block;
+      transition: background-color 0.3s;
+    }
+
+    nav ul li a:hover, nav ul li a:focus {
+      background-color: #555;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+
+    section {
+      margin-bottom: 40px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    section h2 {
+      margin-bottom: 15px;
+      color: #222;
+    }
+
+    /* Responsive video container */
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 ratio */
+      height: 0;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Video footer with download button */
+    .video-footer {
+      margin-top: 10px;
+      text-align: right;
+    }
+
+    .download-btn {
+      background-color: #007bff;
+      color: #fff;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      transition: background-color 0.3s;
+    }
+
+    .download-btn i {
+      margin-right: 8px;
+    }
+
+    .download-btn:hover {
+      background-color: #0056b3;
+    }
+
+    /* Floating footer, sticky at bottom for large screens */
+    footer {
+      background-color: #222;
+      color: #fff;
+      text-align: center;
+      padding: 15px 10px;
+      position: sticky;
+      bottom: 0;
+    }
+
+    /* Add some responsive design adjustments */
+    @media(max-width: 768px) {
+      nav ul {
+        flex-direction: column;
+      }
+      nav ul li {
+        margin: 10px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Welcome to My Updated Website</h1>
+  <p>A sleek, full-featured site with videos and downloads</p>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="#home">Home</a></li>
+    <li><a href="#videos">Videos</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <section id="home">
+    <h2>Home</h2>
+    <p>This is a more developed example of a modern, responsive website. Feel free to customize it further.</p>
+  </section>
+
+  <section id="videos">
+    <h2>Featured Videos</h2>
+
+    <div class="video-item">
+      <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/DNm3YY6TwmM?si=RCUGHYZ4swg9WESK" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <div class="video-footer">
+        <a href="https://www.youtube.com/embed/GwGTPb6J-mE?si=SSej5znhh7C1xpMs" target="_blank" class="download-btn">
+          <i class="fas fa-download"></i> Download
+        </a>
+      </div>
+    </div>
+
+    <div class="video-item" style="margin-top:20px;">
+      <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/oYRda7UtuhA" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <div class="video-footer">
+        <a href="https://www.y2mate.com/youtube/oYRda7UtuhA" target="_blank" class="download-btn">
+          <i class="fas fa-download"></i> Download
+        </a>
+      </div>
+    </div>
+
+  </section>
+
+  <section id="about">
+    <h2>About Us</h2>
+    <p>Here’s where you tell visitors a little about your project, your mission, or whatever context makes sense.</p>
+  </section>
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>Provide contact info, forms, or links to social media here.</p>
+  </section>
+
+</main>
+
+<footer>
+  <p>&copy; 2023 My Updated Website. All rights reserved.</p>
+</footer>
+<script src="/cloudgaminghub/920.js"></script>
+</body>
+</html>
