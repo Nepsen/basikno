@@ -1,316 +1,39 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <title>OpenA — Serverless Chat (GunDB + Bot)</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <!-- GunDB (P2P realtime) -->
-  <script src="https://cdn.jsdelivr.net/npm/gun/gun.min.js"></script>
-
-  <style>
-    :root{
-      --bg:#0b0f14; --panel:#121924; --muted:#7a8599; --text:#e9eef5;
-      --accent:#67e8f9; --btn:#1f2937; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
-      --radius:18px;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
-    .wrap{max-width:920px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px;height:100%}
-    header{display:flex;gap:12px;align-items:center;justify-content:space-between}
-    .brand{display:flex;align-items:center;gap:10px}
-    .logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#8b5cf6)}
-    .title{font-weight:800;font-size:20px;letter-spacing:.2px}
-    .status{font-size:12px;color:var(--muted)}
-    .card{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 12px}
-    input,textarea,button,select{border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#0f1520;color:var(--text);padding:10px 12px}
-    input::placeholder,textarea::placeholder{color:#99a3b5}
-    button{background:var(--btn);cursor:pointer}
-    button.primary{background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#071018;border:none}
-    button:disabled{opacity:.6;cursor:not-allowed}
-    .flex{display:flex;gap:8px}
-    .grow{flex:1}
-    .stack{display:flex;flex-direction:column;gap:8px}
-    .msg-list{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
-    .msg{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:14px;background:#0f1520;border:1px solid rgba(255,255,255,.06)}
-    .me{border-color:rgba(103,232,249,.35);background:rgba(103,232,249,.06)}
-    .bot{border-color:rgba(139,92,246,.35);background:rgba(139,92,246,.08)}
-    .avatar{width:34px;height:34px;border-radius:12px;background:#18212f;display:grid;place-items:center;font-weight:700}
-    .meta{font-size:12px;color:var(--muted)}
-    .content{white-space:pre-wrap;word-wrap:break-word}
-    .img{margin-top:6px;border-radius:12px;max-width:260px;max-height:260px;border:1px solid rgba(255,255,255,.08)}
-    .footer{padding:10px 12px;display:flex;gap:8px;align-items:center}
-    .pill{padding:4px 8px;border-radius:999px;background:#0f1520;border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--muted)}
-    .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
-    .small{font-size:12px}
-    .link{color:var(--accent);text-decoration:none}
-  </style>
+    <title>GunDB Chat</title>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="logo"></div>
-        <div>
-          <div class="title">OpenA — Serverless Chat</div>
-          <div class="status" id="status">connecting…</div>
-        </div>
-      </div>
-      <div class="flex">
-        <span class="pill small">No server • GunDB relays</span>
-      </div>
-    </header>
+    <h2>GunDB Chat Example</h2>
+    <input id="name" placeholder="Your Name">
+    <input id="msg" placeholder="Type message...">
+    <button onclick="send()">Send</button>
 
-    <!-- Controls -->
-    <div class="card controls">
-      <input id="name" placeholder="Your name (saved locally)" class="grow" />
-      <select id="room">
-        <option value="opena-global">#opena-global</option>
-        <option value="opena-dev">#opena-dev</option>
-        <option value="opena-random">#opena-random</option>
-      </select>
-      <input id="relay" placeholder="Add relay (https://…/gun)" class="grow" />
-      <button id="addRelay">Add relay</button>
-      <button id="clearLocal">Clear local cache</button>
-    </div>
+    <div id="chat"></div>
 
-    <!-- Messages -->
-    <div class="card msg-list" id="list" aria-live="polite"></div>
+    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+    <script>
+        // GunDB with Public Relay Server
+        const gun = Gun({
+            peers: ['https://gun-manhattan.herokuapp.com/gun'] // Public Relay
+        });
 
-    <!-- Composer -->
-    <div class="card footer">
-      <input id="image" placeholder="Image URL (optional, IPFS/http)" class="grow" />
-      <textarea id="text" placeholder="Type message…  (Shift+Enter = newline)" rows="2" class="grow"></textarea>
-      <button class="primary" id="send">Send ↵</button>
-    </div>
+        const chat = gun.get('mychat');
 
-    <div class="status small">
-      Tips: Paste IPFS links like <span class="pill">ipfs://CID</span> or a gateway URL.  
-      Built-in bot: <span class="pill">/help</span> <span class="pill">/time</span> <span class="pill">/echo hello</span> <span class="pill">/calc 2+2*3</span>
-    </div>
-  </div>
+        function send() {
+            const name = document.getElementById('name').value;
+            const msg = document.getElementById('msg').value;
+            if (name && msg) {
+                chat.set({ name: name, message: msg, time: Date.now() });
+                document.getElementById('msg').value = '';
+            }
+        }
 
-  <script>
-    // ========= minimal util =========
-    const $ = sel => document.querySelector(sel);
-    const rnd = () => Math.random().toString(36).slice(2);
-    const nowISO = () => new Date().toISOString();
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-    // ========= identity & local cache =========
-    const STATE = {
-      uid: localStorage.getItem("opena_uid") || ("u_" + rnd() + rnd()),
-      name: localStorage.getItem("opena_name") || "",
-      relays: JSON.parse(localStorage.getItem("opena_relays") || "[]"),
-      offlineQueue: JSON.parse(localStorage.getItem("opena_queue") || "[]"),
-    };
-    localStorage.setItem("opena_uid", STATE.uid);
-
-    // Defaults: a few public GunDB relays (can be flaky; you can add your own)
-    if (!STATE.relays.length) {
-      STATE.relays = [
-        "https://gun-manhattan.herokuapp.com/gun",
-        "https://relay.peer.estate/gun",
-        "https://gun-eu.herokuapp.com/gun"
-      ];
-      localStorage.setItem("opena_relays", JSON.stringify(STATE.relays));
-    }
-
-    // ========= init Gun =========
-    const gun = Gun(STATE.relays.map(url => ({peers:[url]})));
-    const ROOT = gun.get("opena").get("rooms");
-
-    // UI refs
-    const list = $("#list"), nameI = $("#name"), roomSel = $("#room"),
-          textI = $("#text"), imgI = $("#image"), sendBtn = $("#send"),
-          relayI = $("#relay"), addRelayBtn = $("#addRelay"), statusEl = $("#status");
-
-    nameI.value = STATE.name;
-    nameI.addEventListener("change", () => {
-      STATE.name = nameI.value.trim() || "Guest";
-      localStorage.setItem("opena_name", STATE.name);
-    });
-
-    $("#clearLocal").onclick = () => {
-      if (confirm("Clear local cache? (identity kept)")) {
-        localStorage.removeItem("opena_queue");
-        indexedDB.deleteDatabase('gun'); // clear gun local storage
-        alert("Cleared local cache. Reload the page.");
-        location.reload();
-      }
-    };
-
-    addRelayBtn.onclick = () => {
-      const url = relayI.value.trim();
-      if (!url) return;
-      STATE.relays.push(url);
-      localStorage.setItem("opena_relays", JSON.stringify(STATE.relays));
-      alert("Relay added. Reload to connect: " + url);
-      relayI.value = "";
-    };
-
-    // connection status
-    gun.on('hi', peer => setStatus(`connected ✓  (${peer?.url || 'peer'})`));
-    gun.on('bye', peer => setStatus(`reconnecting… (${peer?.url || 'peer'})`));
-    function setStatus(s){ statusEl.textContent = s; }
-
-    // ========= render =========
-    const seen = new Set();
-    function renderMsg(m){
-      if (!m || !m.id || seen.has(m.id)) return;
-      seen.add(m.id);
-      const isMe = m.uid === STATE.uid;
-      const node = document.createElement("div");
-      node.className = "msg " + (m.bot ? "bot" : (isMe ? "me" : ""));
-      node.innerHTML = `
-        <div class="avatar">${(m.bot ? "🤖" : (isMe ? "🧑" : "👤"))}</div>
-        <div class="stack">
-          <div class="meta">
-            <b>${escapeHtml(m.name || (m.bot?"OpenA Bot":"Guest"))}</b>
-            <span> • </span>
-            <span>${new Date(m.ts).toLocaleString()}</span>
-            ${m.image ? ` <span class="pill">img</span>` : ""}
-            ${m.room ? ` <span class="pill">#${escapeHtml(m.room)}</span>` : ""}
-          </div>
-          <div class="content">${linkify(escapeHtml(m.text || ""))}</div>
-          ${m.image ? `<img class="img" src="${escapeAttr(toHttpGateway(m.image))}" alt="image" />` : ""}
-        </div>`;
-      list.appendChild(node);
-      list.scrollTop = list.scrollHeight;
-    }
-
-    function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-    function escapeAttr(s){ return s.replace(/"/g,'&quot;'); }
-    function linkify(s){
-      return s.replace(/(ipfs:\/\/[a-z0-9]+)|https?:\/\/\S+/gi, u => `<a class="link" target="_blank" rel="noopener" href="${toHttpGateway(u)}">${u}</a>`);
-    }
-    function toHttpGateway(u){
-      if (u.startsWith("ipfs://")) {
-        const cid = u.replace("ipfs://","");
-        return `https://cloudflare-ipfs.com/ipfs/${cid}`;
-      }
-      return u;
-    }
-
-    // ========= subscribe current room =========
-    let roomRef, roomName = roomSel.value;
-    function joinRoom(name){
-      roomName = name;
-      list.innerHTML = ""; seen.clear();
-      roomRef = ROOT.get(name).get("messages");
-      roomRef.map().on((data, key) => {
-        if (!data) return;
-        renderMsg(data);
-      });
-      setStatus(`joined #${roomName} — syncing…`);
-    }
-    joinRoom(roomName);
-    roomSel.onchange = () => joinRoom(roomSel.value);
-
-    // ========= rate limit =========
-    const rate = { last: 0, tokens: 5, max: 5, refillMs: 3000 };
-    function canSend(){
-      const now = Date.now();
-      if (now - rate.last > rate.refillMs) { rate.tokens = Math.min(rate.max, rate.tokens + 1); rate.last = now; }
-      if (rate.tokens <= 0) { return false; }
-      rate.tokens--; return true;
-    }
-
-    // ========= send =========
-    async function send(){
-      const text = textI.value.trim();
-      const image = imgI.value.trim();
-      if (!text && !image) return;
-
-      const msg = {
-        id: "m_" + Date.now() + "_" + rnd(),
-        uid: STATE.uid,
-        name: (STATE.name = (nameI.value.trim() || "Guest")),
-        room: roomName,
-        text, image,
-        ts: nowISO()
-      };
-
-      const push = () => roomRef.set(msg);
-      if (navigator.onLine && canSend()){
-        push();
-      } else {
-        // queue offline
-        STATE.offlineQueue.push(msg);
-        localStorage.setItem("opena_queue", JSON.stringify(STATE.offlineQueue));
-        toast("Queued offline, will sync later.");
-      }
-
-      // lightweight bot reactions (always client-side so zero server)
-      botMaybeReply(msg);
-
-      textI.value = ""; imgI.value = "";
-    }
-
-    sendBtn.onclick = send;
-    textI.addEventListener("keydown", e=>{
-      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
-    });
-
-    // ========= offline queue flush =========
-    async function flushQueue(){
-      if (!navigator.onLine || !STATE.offlineQueue.length) return;
-      const copy = STATE.offlineQueue.slice();
-      STATE.offlineQueue = [];
-      localStorage.setItem("opena_queue","[]");
-      for (const m of copy){ roomRef.set(m); await sleep(20); }
-      if (copy.length) toast(`Synced ${copy.length} queued message(s).`);
-    }
-    window.addEventListener("online", flushQueue);
-    setInterval(flushQueue, 4000);
-
-    // ========= simple client-side bot =========
-    function botSay(text, extra={}){
-      const botMsg = {
-        id: "b_" + Date.now() + "_" + rnd(),
-        uid: "bot",
-        bot: true,
-        name: "OpenA Bot",
-        room: roomName,
-        text,
-        image: extra.image || "",
-        ts: nowISO()
-      };
-      roomRef.set(botMsg);
-    }
-
-    function botMaybeReply(m){
-      if (!m.text) return;
-      const t = m.text.trim();
-
-      if (t.startsWith("/help")){
-        botSay("Commands:\n/help • /time • /echo <text> • /calc <expr>\nTips: paste ipfs://CID to auto-link via gateway.");
-      } else if (t.startsWith("/time")){
-        botSay("Current time: " + new Date().toLocaleString());
-      } else if (t.startsWith("/echo ")){
-        botSay(t.slice(6));
-      } else if (t.startsWith("/calc ")){
-        try{
-          const expr = t.slice(6).replace(/[^-+*/().0-9\s]/g,"");
-          // very simple eval (numbers/operators only)
-          // eslint-disable-next-line no-eval
-          const val = eval(expr);
-          botSay(`= ${val}`);
-        }catch{ botSay("Invalid expression."); }
-      } else if (/^hi$|^hello$|^hey$/i.test(t)){
-        botSay("Hi! Type /help to see commands.");
-      }
-    }
-
-    // ========= UX helpers =========
-    function toast(msg){
-      setStatus(msg);
-      setTimeout(()=> setStatus(`connected ✓ ${roomName ? "• #"+roomName:""}`), 2500);
-    }
-
-    // Prefill saved name
-    if (!STATE.name){ nameI.value = ""; } else { nameI.value = STATE.name; }
-
-  </script>
+        chat.map().on((data, id) => {
+            if (data) {
+                document.getElementById('chat').innerHTML += `<p><b>${data.name}:</b> ${data.message}</p>`;
+            }
+        });
+    </script>
 </body>
 </html>
